@@ -8,6 +8,7 @@ function App() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
+
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
@@ -18,19 +19,20 @@ function App() {
       setMessage("Please select a file first.");
       return;
     }
+  
 
-    const formData = new FormData();
-    formData.append('file', file);
+  const formData = new FormData();
+  formData.append('file', file);
 
-    try {
-      const response = await axios.post('http://127.0.0.1:5001/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setMessage(response.data.message);
-    } catch (error) {
-      setMessage(error.response?.data?.error || "An error occurred.");
-    }
-  };
+  try {
+    const response = await axios.post('http://127.0.0.1:5001/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    setMessage(response.data.message);
+  } catch (error) {
+    setMessage(error.response?.data?.error || "An error occurred.");
+  }
+};
 
   return (
     <div className="App">

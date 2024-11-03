@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 import utils
 import tempfile
-
+import time 
 app = Flask(__name__)
 CORS(app)
 
@@ -43,11 +43,12 @@ def upload_file():
 
         #Push the file to the repository
         utils.push_to_repo(file, temp_folder, REPO_NAME, BASE_BRANCH)
-
-
+        
         return jsonify({'message': 'File uploaded successfully!'}), 200
         
     
 
 if __name__ == '__main__':
+    utils.git_setup()
+    utils.authenticate_gh()
     app.run(port="5001", debug=True)
