@@ -105,6 +105,7 @@ def branch_out():
     subprocess.run(["git", "push", "--set-upstream", "origin", branch_name], check=True)
     return branch_name
     
+
 def authenticate_gh():
     # Get the GitHub token from the environment
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -119,24 +120,16 @@ def authenticate_gh():
 
         if status_result.returncode == 0:
             print("GitHub CLI is already authenticated.")
+            return  # No need to re-authenticate
         else:
-            # Temporarily remove GITHUB_TOKEN for logout step
-            del os.environ["GITHUB_TOKEN"]
+            print("GitHub CLI is not authenticated. Proceeding with login.")
 
-            # Log out of any previous authentication
-            subprocess.run(["gh", "auth", "logout", "--hostname", "github.com"], check=True)
-            print("Previous GitHub authentication cleared.")
-
-            # Restore the GITHUB_TOKEN environment variable
-            os.environ["GITHUB_TOKEN"] = GITHUB_TOKEN
-
-            # Authenticate with GitHub CLI
-            subprocess.run(["gh", "auth", "login", "--with-token"], input=GITHUB_TOKEN.encode(), check=True)
-            print("GitHub authentication successful.")
+        # Authenticate with GitHub CLI using the provided token
+        subprocess.run(["gh", "auth", "login", "--with-token"], input=GITHUB_TOKEN.encode(), check=True)
+        print("GitHub authentication successful.")
         
     except subprocess.CalledProcessError as e:
         print(f"Error during GitHub authentication: {e}")
-
 
 def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
     """
