@@ -13,10 +13,8 @@ html, body {
   justify-content: center;
 }
 
-
-
 .App-logo {
-  height: 40vmin;
+  height: 30vmin;
   pointer-events: none;
 }
 
@@ -27,7 +25,6 @@ html, body {
 }
 
 .App-header {
-  
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -48,4 +45,54 @@ html, body {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Modern button styles */
+.button {
+  background-color: #007bff; /* Primary color */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  height: 40px; /* Fixed height for equal height buttons */
+  line-height: 20px; /* Adjust line height for vertical alignment */
+}
+
+.button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.button:active {
+  background-color: #004494; /* Even darker shade on click */
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Focus ring */
+}
+
+/* Hide the default file input */
+.file-input {
+  display: none;
+}
+
+/* Ensure vertical layout for form elements */
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-form p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
 }
