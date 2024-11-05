@@ -31,6 +31,10 @@ def is_input_valid(file):
     return True
 
 
+import os
+import subprocess
+from werkzeug.datastructures import FileStorage
+
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""
 
@@ -94,11 +98,12 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     return pr_url, branch_name
 
 
+
 def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
     """Create a pull request using GitHub CLI."""
     result = subprocess.run(
         [
-            "C:\\Program Files\\GitHub CLI\\gh.exe", "pr", "create",
+            "gh", "pr", "create",
             "--title", f"Add new file to {base_branch} from {contributer_name}",
             "--body", "This PR adds a new file to the repository.",
             "--base", base_branch,
@@ -106,15 +111,9 @@ def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
             "-R", repo_name
         ],
         check=True,
-        shell=True,
         capture_output=True,
         text=True
     )
-    
-    # Extract and return the PR URL
-    pr_url = result.stdout.strip()
-    print(f"Pull request created: {pr_url}")
-    return pr_url
 
 
 def branch_out():
