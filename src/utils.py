@@ -33,7 +33,13 @@ def is_input_valid(file):
 
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""
-    # Clone the repository
+
+    # Retrieve the GitHub token from environment variables
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    if not GITHUB_TOKEN:
+        raise ValueError("GITHUB_TOKEN environment variable not set")
+
+    # Clone the repository with the token
     subprocess.run(
         [
             "git",
@@ -42,16 +48,16 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
             base_branch,
             "--single-branch",
             "--depth=1",
-            f"https://github.com/{repo_name}.git",
+            f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git",
             repo_folder,
         ],
         check=True
     )
     print("Cloned repository")
-    
+
     # Change to the repository folder
     os.chdir(repo_folder)
-    
+
     # Determine the next numbered directory within info_files
     info_files_path = os.path.join("Scripts", "BuildDatabank", "info_files")
     existing_folders = [
@@ -59,22 +65,25 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     ]
     next_folder_number = max(existing_folders, default=0) + 1
     new_folder_path = os.path.join(info_files_path, str(next_folder_number))
-    
+
     # Create the new folder
     os.makedirs(new_folder_path, exist_ok=True)
-    
+
     # Save the file in the new folder
     save_path = os.path.join(new_folder_path, file.filename)
     file.save(save_path)
     print(f"Saved file to {save_path}")
-    
+
     # Create and switch to a new branch
     branch_name = branch_out()
-  
+
+    # Set the remote URL to include the token (for push)
+    subprocess.run(["git", "remote", "set-url", "origin", f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git"], check=True)
+
     # Add, commit, and push the file to the repository
     subprocess.run(["git", "add", save_path], check=True)
     subprocess.run(["git", "commit", "-m", "Add new file"], check=True)
-    subprocess.run(["git", "push"], check=True)
+    subprocess.run(["git", "push", "--set-upstream", "origin", branch_name], check=True)
     print("Pushed file to new branch")
 
     # Create a pull request

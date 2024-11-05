@@ -4,7 +4,7 @@ import './App.css';
 import logo from './logo.svg'; // Ensure the logo file path is correct
 
 function App() {
-  const IP = 'http://127.0.0.1'   //Change this to your local IP or IP of hosted python server. 
+  const IP = 'http://10.0.0.23'   //Change this to your local IP or IP of hosted python server. 
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("Upload your info.yaml file here");
   const [name, setName] = useState("");
@@ -36,7 +36,7 @@ function App() {
     formData.append('name', name);
     setMessage("Your data is currently being processed and sent to GitHub")
     try {
-      const response = await axios.post('${IP}:5001/upload', formData, {
+      const response = await axios.post(`${IP}:5001/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMessage(response.data.message);
