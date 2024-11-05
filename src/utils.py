@@ -114,6 +114,10 @@ def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
         capture_output=True,
         text=True
     )
+     # Extract and return the PR URL
+    pr_url = result.stdout.strip()
+    print(f"Pull request created: {pr_url}")
+    return pr_url
 
 
 def branch_out():
