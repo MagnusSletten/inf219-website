@@ -25,6 +25,7 @@ def upload_file():
         return jsonify({'error': 'No file part in the request'}), 400
 
     file = request.files['file']
+    name = request.form.get("name")
     if file.filename == '':
         return jsonify({'error': 'No file selected for uploading'}), 400
 
@@ -42,13 +43,19 @@ def upload_file():
         print(f"Created temporary directory: {temp_folder}")
 
         #Push the file to the repository
-        utils.push_to_repo(file, temp_folder, REPO_NAME, BASE_BRANCH)
+        repo_url,branch_name = utils.push_to_repo(file,name, temp_folder, REPO_NAME, BASE_BRANCH)
+    
+    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH)
         
-        return jsonify({'message': 'File uploaded successfully!'}), 200
+    return jsonify({
+    'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
+    
+}), 200
         
     
 
 if __name__ == '__main__':
     utils.git_setup()
     utils.authenticate_gh()
-    app.run(port="5001", debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
+

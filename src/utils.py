@@ -11,6 +11,7 @@ def is_input_valid(file):
     try:
         data = yaml.safe_load(file)
     except yaml.YAMLError as exc:
+        print("safe load failed")
         return False
 
     required_keys = [
@@ -19,20 +20,18 @@ def is_input_valid(file):
 
     for key in required_keys:
         if key not in data:
+            print("not keu")
             return False
 
     # Additional checks for COMPOSITION dictionary
     if not isinstance(data["COMPOSITION"], dict):
-        return False
-
-    # Check for UNITEDATOM_DICT if it's a UA simulation
-    if "UNITEDATOM_DICT" in data and not isinstance(data["UNITEDATOM_DICT"], dict):
+        print("not comp")
         return False
 
     return True
 
 
-def push_to_repo(file: FileStorage, repo_folder, repo_name, base_branch):
+def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""
     # Clone the repository
     subprocess.run(
@@ -78,24 +77,35 @@ def push_to_repo(file: FileStorage, repo_folder, repo_name, base_branch):
     subprocess.run(["git", "push"], check=True)
     print("Pushed file to new branch")
 
-    # Create a pull request to the base branch using GitHub CLI and wait for completion
-    subprocess.run(
-    [
-        "C:\\Program Files\\GitHub CLI\\gh.exe", "pr", "create",
-        "--title", f"Add new file to {base_branch}",
-        "--body", "This PR adds a new file to the repository.",
-        "--base", base_branch,
-        "--head", branch_name,
-        "-R", f"{repo_name}"  # Specify the repository here
-    ],
-    check=True,
-    shell=True
-)
+    # Create a pull request
+    pr_url = create_pull_request(repo_name, base_branch, branch_name, contributer_name)
 
-    print("Pull request created successfully")
     # Return to the original directory
     os.chdir("..")
-    return True
+    return pr_url, branch_name
+
+
+def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
+    """Create a pull request using GitHub CLI."""
+    result = subprocess.run(
+        [
+            "C:\\Program Files\\GitHub CLI\\gh.exe", "pr", "create",
+            "--title", f"Add new file to {base_branch} from {contributer_name}",
+            "--body", "This PR adds a new file to the repository.",
+            "--base", base_branch,
+            "--head", branch_name,
+            "-R", repo_name
+        ],
+        check=True,
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+    
+    # Extract and return the PR URL
+    pr_url = result.stdout.strip()
+    print(f"Pull request created: {pr_url}")
+    return pr_url
 
 
 def branch_out():
@@ -109,10 +119,6 @@ def branch_out():
 def authenticate_gh():
     # Get the GitHub token from the environment
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-    
-    if not GITHUB_TOKEN:
-        print("GITHUB_TOKEN environment variable not set.")
-        return  # Exit the function if the token is not set
 
     try:
         # Check if already authenticated
@@ -123,6 +129,10 @@ def authenticate_gh():
             return  # No need to re-authenticate
         else:
             print("GitHub CLI is not authenticated. Proceeding with login.")
+        
+        if not GITHUB_TOKEN:
+            print("GITHUB_TOKEN environment variable not set.")
+            return  # Exit the function if the token is not set
 
         # Authenticate with GitHub CLI using the provided token
         subprocess.run(["gh", "auth", "login", "--with-token"], input=GITHUB_TOKEN.encode(), check=True)
@@ -130,6 +140,7 @@ def authenticate_gh():
         
     except subprocess.CalledProcessError as e:
         print(f"Error during GitHub authentication: {e}")
+
 
 def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
     """
@@ -148,3 +159,26 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 
 
+def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_pipeline"):
+    """Triggers the AddData GitHub workflow using the GitHub CLI."""
+    workflow_filename = "AddData.yml"  # Fixed workflow filename
+
+    try:
+        result = subprocess.run(
+            [
+                "gh", "workflow", "run", workflow_filename,
+                "--repo", repo_name,
+                "--ref", workflow_branch,  # Specify the branch containing the workflow file
+                "--field", f"working_branch_name={working_branch_name}",
+                "--field", f"target_branch_name={target_branch_name}"
+            ],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        workflow_trigger_output = result.stdout.strip()
+        print(f"Workflow triggered successfully: {workflow_trigger_output}")
+        return workflow_trigger_output
+    except subprocess.CalledProcessError as e:
+        print(f"Error triggering workflow: {e.stderr}")
+        return None
