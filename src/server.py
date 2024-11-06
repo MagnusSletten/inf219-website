@@ -10,7 +10,7 @@ CORS(app)
 
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
-BASE_BRANCH = 'dev_pipeline'
+BASE_BRANCH = 'dev_pipeline_compose'
 
 
 
