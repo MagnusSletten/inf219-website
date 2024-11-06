@@ -45,7 +45,7 @@ def upload_file():
         #Push the file to the repository
         repo_url,branch_name = utils.push_to_repo(file,name, temp_folder, REPO_NAME, BASE_BRANCH)
     
-    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH)
+    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=BASE_BRANCH)
         
     return jsonify({
     'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
