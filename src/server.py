@@ -41,7 +41,6 @@ def upload_file():
     #Create a tempfolder
     with tempfile.TemporaryDirectory() as temp_folder:
         print(f"Created temporary directory: {temp_folder}")
-
         #Push the file to the repository
         repo_url,branch_name = utils.push_to_repo(file,name, temp_folder, REPO_NAME, BASE_BRANCH)
     
