@@ -10,6 +10,7 @@ def is_input_valid(file):
     """Validate the input file for the required keys and values."""
     try:
         data = yaml.safe_load(file)
+        file.seek(0)  # Reset file pointer after reading
     except yaml.YAMLError as exc:
         print("safe load failed")
         return False
@@ -20,12 +21,12 @@ def is_input_valid(file):
 
     for key in required_keys:
         if key not in data:
-            print("not keu")
+            print("missing required key:", key)
             return False
 
     # Additional checks for COMPOSITION dictionary
-    if not isinstance(data["COMPOSITION"], dict):
-        print("not comp")
+    if "COMPOSITION" not in data or not isinstance(data["COMPOSITION"], dict):
+        print("COMPOSITION key missing or not a dictionary")
         return False
 
     return True
