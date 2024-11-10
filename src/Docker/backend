@@ -1,6 +1,11 @@
 # Use the official Python base image
 FROM python:3.10-slim
 
+# Argument for repository URL
+ARG REPO_URL="https://github.com/MagnusSletten/Databank"
+ARG START_BRANCH_NAME="dev_pipeline_compose"
+ARG website_branch="docker"
+
 # Set environment variables for Flask
 ENV FLASK_APP=server.py
 ENV FLASK_ENV=production
@@ -12,7 +17,10 @@ WORKDIR /app/inf219-website
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 # Clone the repository into /app/inf219-website
-RUN git clone https://github.com/MagnusSletten/inf219-website.git .
+RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-website.git .
+
+# Clone the specified branch of the repository
+RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} /Databank
 
 # Install GitHub CLI and other utilities
 RUN apt-get update && \

@@ -44,22 +44,6 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     if not GITHUB_TOKEN:
         raise ValueError("GITHUB_TOKEN environment variable not set")
 
-    # Clone the repository with the token
-    subprocess.run(
-        [
-            "git",
-            "clone",
-            "-b",
-            base_branch,
-            "--single-branch",
-            "--depth=1",
-            f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git",
-            repo_folder,
-        ],
-        check=True
-    )
-    print("Cloned repository")
-
     # Change to the repository folder
     os.chdir(repo_folder)
 
