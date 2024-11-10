@@ -65,11 +65,12 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     file.save(save_path)
     print(f"Saved file to {save_path}")
 
-    # Create and switch to a new branch
-    branch_name = branch_out()
-
+ 
     # Set the remote URL to include the token (for push)
     subprocess.run(["git", "remote", "set-url", "origin", f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git"], check=True)
+
+    # Create and switch to a new branch
+    branch_name = branch_out()
 
     # Add, commit, and push the file to the repository
     subprocess.run(["git", "add", save_path], check=True)

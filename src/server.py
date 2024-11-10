@@ -39,7 +39,7 @@ def upload_file():
         return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
 
    
-    repo_url,branch_name = utils.push_to_repo(file,name, '/Databank', REPO_NAME, BASE_BRANCH)
+    repo_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
     
     utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=BASE_BRANCH)
         
