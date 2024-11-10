@@ -38,7 +38,7 @@ from werkzeug.datastructures import FileStorage
 
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""
-
+    
     # Retrieve the GitHub token from environment variables
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     if not GITHUB_TOKEN:
@@ -46,6 +46,7 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
     # Change to the repository folder
     os.chdir(repo_folder)
+    subprocess.run(["git", "pull"])
 
     # Determine the next numbered directory within info_files
     info_files_path = os.path.join("Scripts", "BuildDatabank", "info_files")
