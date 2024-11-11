@@ -46,6 +46,7 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
     # Change to the repository folder
     os.chdir(repo_folder)
+    subprocess.run(["git", "checkout", base_branch], check=True)
     subprocess.run(["git", "pull"])
 
     # Determine the next numbered directory within info_files
