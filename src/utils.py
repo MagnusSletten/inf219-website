@@ -62,7 +62,6 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
     # Save the file in the new folder
     save_path = os.path.join(new_folder_path, file.filename)
-    print("Test",flush=True)
     file.save(save_path)
     print(f"Saved file to {save_path}")
 

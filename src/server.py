@@ -44,7 +44,7 @@ def upload_file():
     utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=BASE_BRANCH)
             
     return jsonify({
-        'message': f"File uploaded successfully!<br>Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
+        'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
 }), 200
     
 
