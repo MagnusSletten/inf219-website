@@ -37,16 +37,29 @@ html, body {
 .App-link {
   color: #61dafb;
 }
+.dropdown-label {
+  font-size: 40px;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
 
 .name-input {
   width: 100%;              /* Makes the input full-width */
   padding: 10px;            /* Adds padding inside the input */
-  margin-top: 10px;         /* Adds space above the input */
+  margin-top: 10px;
+  margin-bottom: 16px;         /* Adds space above the input */
   border: 1px solid #ccc;   /* Sets a light gray border */
   border-radius: 4px;       /* Rounds the corners */
   font-size: 16px;          /* Increases font size */
   outline: none;            /* Removes the outline on focus */
   transition: border-color 0.3s ease;  /* Adds transition for border color */
+}
+
+
+.branch-select {
+  margin-bottom: 16px;
+  font-size: 16px; 
 }
 
 @keyframes App-logo-spin {

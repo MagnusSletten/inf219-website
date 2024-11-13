@@ -1,23 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import logo from './logo.svg'; // Ensure the logo file path is correct
+import logo from './logo.svg';
 
 function App() {
-  const IP = 'https://632a-2001-464a-61a0-0-9194-5e49-919b-7036.ngrok-free.app/'   //Change this to your local IP or IP of hosted python server. 
+  const IP = 'https://d9b4-2001-464a-61a0-0-19f2-c5e7-5526-bec8.ngrok-free.app/';
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("Upload your info.yaml file here");
   const [name, setName] = useState("");
+  const [branches, setBranches] = useState([]); // State for branches
+  const [selectedBranch, setSelectedBranch] = useState("main"); // Default to 'main'
+
+  useEffect(() => {
+    // Fetch branches from GitHub repository
+    const fetchBranches = async () => {
+      try {
+        const response = await axios.get('https://api.github.com/repos/MagnusSletten/Databank/branches');
+        const branchNames = response.data.map(branch => branch.name);
+        setBranches(branchNames);
+
+        // Set 'main' as the selected branch if it exists, otherwise default to the first branch
+        if (branchNames.includes("main")) {
+          setSelectedBranch("main");
+        } else if (branchNames.length > 0) {
+          setSelectedBranch(branchNames[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+        setMessage("Failed to load branches.");
+      }
+    };
+    fetchBranches();
+  }, []);
 
   const handleNameChange = (event) => {
-    const curr_name = event.target.value;
-    setName(curr_name);
+    setName(event.target.value);
   };
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
     setMessage(selectedFile ? `You have selected ${selectedFile.name} for upload` : "Upload your info.yaml file here");
+  };
+
+  const handleBranchChange = (event) => {
+    setSelectedBranch(event.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -34,7 +61,10 @@ function App() {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('name', name);
-    setMessage("Your data is currently being processed and sent to GitHub")
+    formData.append('branch', selectedBranch); // Append selected branch to form data
+
+    setMessage("Your data is currently being processed and sent to GitHub");
+
     try {
       const response = await axios.post(`${IP}upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -59,6 +89,15 @@ function App() {
             onChange={handleNameChange}
             className="name-input"
           />
+          {/* Dropdown description */}
+          <label htmlFor="branch-select" className="dropdown-label">
+            Select a branch to upload to:
+          </label>
+          <select value={selectedBranch} onChange={handleBranchChange} className="branch-select">
+            {branches.map(branch => (
+              <option key={branch} value={branch}>{branch}</option>
+            ))}
+          </select>
           <input
             id="file-upload"
             type="file"

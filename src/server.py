@@ -11,7 +11,7 @@ CORS(app)
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
 BASE_BRANCH = 'dev_pipeline_compose'
-
+WORKFLOW_BRANCH = 'MagnusSletten/Databank'
 
 
 @app.route('/awake', methods=['GET'])
@@ -21,6 +21,8 @@ def awake():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    BASE_BRANCH=request.form.get['branch']
+   
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
 
@@ -41,7 +43,7 @@ def upload_file():
    
     repo_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
     
-    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=BASE_BRANCH)
+    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=WORKFLOW_BRANCH)
             
     return jsonify({
         'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
