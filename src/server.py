@@ -21,7 +21,7 @@ def awake():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    BASE_BRANCH=request.form.get['branch']
+    BASE_BRANCH=request.form.get('branch')
    
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
