@@ -11,7 +11,7 @@ CORS(app)
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
 BASE_BRANCH = 'dev_pipeline_compose'
-WORKFLOW_BRANCH = 'MagnusSletten/Databank'
+WORKFLOW_BRANCH = 'dev_pipeline_compose'
 
 
 @app.route('/awake', methods=['GET'])

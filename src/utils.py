@@ -160,6 +160,8 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 
 def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_pipeline"):
+    print("Starting to trigger the workflow...")  
+
     """Triggers the AddData GitHub workflow using the GitHub CLI."""
     workflow_filename = "AddData.yml"  # Fixed workflow filename
 
