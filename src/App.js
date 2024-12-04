@@ -4,9 +4,9 @@ import './App.css';
 import logo from './logo.svg';
 
 function App() {
-  const IP = 'https://d9b4-2001-464a-61a0-0-19f2-c5e7-5526-bec8.ngrok-free.app/';
+  const IP = 'https://52a9-2001-464a-61a0-0-41ff-b8d-ceb1-79bf.ngrok-free.app/';
   const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("Upload your info.yaml file here");
+  const [message, setMessage] = useState("Upload your info.yaml file below:");
   const [name, setName] = useState("");
   const [branches, setBranches] = useState([]); // State for branches
   const [selectedBranch, setSelectedBranch] = useState("main"); // Default to 'main'
@@ -80,7 +80,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <h1>Welcome to the NMRLipids Upload API</h1>
-        <h3 dangerouslySetInnerHTML={{ __html: message }} />
+        <h3 className="upload-message" dangerouslySetInnerHTML={{ __html: message }} />
         <form onSubmit={handleSubmit} className="upload-form">
           <input
             type="text"
@@ -90,9 +90,7 @@ function App() {
             className="name-input"
           />
           {/* Dropdown description */}
-          <label htmlFor="branch-select" className="dropdown-label">
-            Select a branch to upload to:
-          </label>
+          <label htmlFor="branch-select" className="dropdown-label"> Select a branch to upload to:</label>
           <select value={selectedBranch} onChange={handleBranchChange} className="branch-select">
             {branches.map(branch => (
               <option key={branch} value={branch}>{branch}</option>
