@@ -38,30 +38,17 @@ from werkzeug.datastructures import FileStorage
 
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""
-
+    
     # Retrieve the GitHub token from environment variables
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     if not GITHUB_TOKEN:
         raise ValueError("GITHUB_TOKEN environment variable not set")
 
-    # Clone the repository with the token
-    subprocess.run(
-        [
-            "git",
-            "clone",
-            "-b",
-            base_branch,
-            "--single-branch",
-            "--depth=1",
-            f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git",
-            repo_folder,
-        ],
-        check=True
-    )
-    print("Cloned repository")
-
     # Change to the repository folder
     os.chdir(repo_folder)
+    subprocess.run(["git", "fetch"])
+    subprocess.run(["git", "checkout", base_branch], check=True)
+    subprocess.run(["git", "pull"])
 
     # Determine the next numbered directory within info_files
     info_files_path = os.path.join("Scripts", "BuildDatabank", "info_files")
@@ -76,15 +63,15 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
     # Save the file in the new folder
     save_path = os.path.join(new_folder_path, file.filename)
-    print("Test",flush=True)
     file.save(save_path)
     print(f"Saved file to {save_path}")
 
-    # Create and switch to a new branch
-    branch_name = branch_out()
-
+ 
     # Set the remote URL to include the token (for push)
     subprocess.run(["git", "remote", "set-url", "origin", f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git"], check=True)
+
+    # Create and switch to a new branch
+    branch_name = branch_out()
 
     # Add, commit, and push the file to the repository
     subprocess.run(["git", "add", save_path], check=True)
@@ -174,6 +161,8 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 
 def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_pipeline"):
+    print("Starting to trigger the workflow...")  
+
     """Triggers the AddData GitHub workflow using the GitHub CLI."""
     workflow_filename = "AddData.yml"  # Fixed workflow filename
 

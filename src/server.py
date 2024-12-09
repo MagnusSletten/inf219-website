@@ -11,7 +11,7 @@ CORS(app)
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
 BASE_BRANCH = 'dev_pipeline_compose'
-
+WORKFLOW_BRANCH = 'dev_pipeline_compose'
 
 
 @app.route('/awake', methods=['GET'])
@@ -21,6 +21,8 @@ def awake():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    BASE_BRANCH=request.form.get('branch')
+   
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
 
@@ -38,18 +40,16 @@ def upload_file():
     if not utils.is_input_valid(file):
         return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
 
-    #Create a tempfolder
-    with tempfile.TemporaryDirectory() as temp_folder:
-        print(f"Created temporary directory: {temp_folder}")
-        #Push the file to the repository
-        repo_url,branch_name = utils.push_to_repo(file,name, temp_folder, REPO_NAME, BASE_BRANCH)
+   
+    repo_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
     
-    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,workflow_branch=BASE_BRANCH)
-        
+    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,BASE_BRANCH)
+            
     return jsonify({
-    'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
-    
+        'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
 }), 200
+    
+
         
     
 
