@@ -93,7 +93,7 @@ def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
     result = subprocess.run(
         [
             "gh", "pr", "create",
-            "--title", f"{contributer_name} addition of new simulation data to {base_branch}",
+            "--title", f"{contributer_name}'s addition of a new simulation to the branch: {base_branch}",
             "--body", "This PR adds a new file to the repository.",
             "--base", base_branch,
             "--head", branch_name,
