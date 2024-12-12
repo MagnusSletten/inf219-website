@@ -4,7 +4,7 @@ import './App.css';
 import logo from './logo.svg';
 
 function App() {
-  const IP = 'https://52a9-2001-464a-61a0-0-41ff-b8d-ceb1-79bf.ngrok-free.app/';
+  const IP = 'https://2f5d-2001-464a-61a0-0-c1ea-aaa-71c7-f3e3.ngrok-free.app/';
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("Upload your info.yaml file below:");
   const [name, setName] = useState("");
