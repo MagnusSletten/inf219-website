@@ -5,13 +5,14 @@ import os
 import utils
 import tempfile
 import time 
+import yaml 
 app = Flask(__name__)
 CORS(app)
 
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
-BASE_BRANCH = 'dev_pipeline_compose'
-WORKFLOW_BRANCH = 'dev_pipeline_compose'
+BASE_BRANCH = 'dev_cicd'
+WORKFLOW_BRANCH = 'dev_cicd'
 
 
 @app.route('/awake', methods=['GET'])

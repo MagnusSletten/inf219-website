@@ -4,37 +4,21 @@ import os
 import yaml
 import time
 from werkzeug.datastructures import FileStorage
+from DatabankLib.databankLibrary import parse_valid_config_settings, YamlBadConfigException
 
 
-def is_input_valid(file):
+def is_input_valid(info_yaml_file:FileStorage ):
+    
     """Validate the input file for the required keys and values."""
     try:
-        data = yaml.safe_load(file)
-        file.seek(0)  # Reset file pointer after reading
-    except yaml.YAMLError as exc:
-        print("safe load failed")
-        return False
-
-    required_keys = [
-        "DOI",
-    ]
-
-    for key in required_keys:
-        if key not in data:
-            print("missing required key:", key)
-            return False
-
-    # Additional checks for COMPOSITION dictionary
-    if "COMPOSITION" not in data or not isinstance(data["COMPOSITION"], dict):
-        print("COMPOSITION key missing or not a dictionary")
+        info_yaml = yaml.safe_load(info_yaml_file.read().decode("utf-8"))
+        sim, files = parse_valid_config_settings(info_yaml)
+    except:
         return False
 
     return True
 
 
-import os
-import subprocess
-from werkzeug.datastructures import FileStorage
 
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
     """Push the file content to the specified repository."""

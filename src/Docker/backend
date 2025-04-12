@@ -3,7 +3,7 @@ FROM python:3.10-slim
 
 # Argument for repository URL
 ARG REPO_URL="https://github.com/MagnusSletten/Databank"
-ARG START_BRANCH_NAME="dev_pipeline_rebase_clean"
+ARG START_BRANCH_NAME="dev_cicd"
 ARG website_branch="main"
 
 # Set environment variables for Flask
@@ -19,8 +19,10 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 # Clone the repository into /app/inf219-website
 RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-website.git .
 
-# Clone the specified branch of the repository
-RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} /Databank
+
+WORKDIR /Databank
+RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . && \
+    pip install --break-system-packages -e . 
 
 # Install GitHub CLI and other utilities
 RUN apt-get update && \

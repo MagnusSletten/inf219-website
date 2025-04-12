@@ -2,20 +2,40 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%; /* Ensures full coverage */
+  background-color: lightblue;
 }
 
+.Container {
+  display: grid;
+  grid-template-columns: 15% 60% 15%;
+  justify-content: center; 
+  
+}
+.Right {
+  
+
+}
 .App {
-  background-color: lightblue;
-  min-height: 100vh; /* Full viewport height */
   display: flex;
   flex-direction: column;
+  max-width: 800px;
+  width: 100%;
+  justify-content: center; 
   align-items: center;
-  justify-content: center;
+  
+}
+
+.description-content {
+  max-width: 300px;
+  text-align: left;
 }
 
 .App-logo {
-  height: 30vmin;
-  pointer-events: none;
+  height: auto;
+  max-height: 150px;
+  width: auto;
+  max-width: 100%;
+  margin-bottom: 1rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -25,48 +45,45 @@ html, body {
 }
 
 .App-header {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 1.5vmin);
   color: white;
+  text-align:center
 }
 
 .App-link {
   color: #61dafb;
 }
 .dropdown-label {
-  font-size: 40px;
+  font-size: 20px;
   color: #ffffff;
   margin-bottom: 5px;
 }
 
 
 .name-input {
-  width: 100%;              /* Makes the input full-width */
-  padding: 10px;            /* Adds padding inside the input */
+  width: 100%;              
+  padding: 10px;            
   margin-top: 10px;
-  margin-bottom: 16px;         /* Adds space above the input */
-  border: 1px solid #ccc;   /* Sets a light gray border */
-  border-radius: 4px;       /* Rounds the corners */
-  font-size: 16px;          /* Increases font size */
-  outline: none;            /* Removes the outline on focus */
-  transition: border-color 0.3s ease;  /* Adds transition for border color */
+  margin-bottom: 16px;         
+  border: 1px solid #ccc;  
+  border-radius: 4px;       
+  font-size: 16px;          
+  outline: none;            
+  transition: border-color 0.3s ease; 
 }
 
 
 .branch-select {
   margin-bottom: 16px;
   padding: 4px; 
-  
   font-size: 16px; 
 }
 
-/* Add this CSS for consistent styling */
 .upload-message {
-  font-size: 40px;
+  font-size: 20px;
   color: #ffffff;
   margin-bottom: 5px;
   text-align: center;
@@ -100,12 +117,11 @@ html, body {
 }
 
 .button:hover {
-  background-color: #0056b3; /* Darker shade on hover */
+  background-color: #0056b3; 
 }
 
 .button:active {
-  background-color: #004494; /* Even darker shade on click */
-}
+  background-color: #004494; }
 
 .button:focus {
   outline: none;
