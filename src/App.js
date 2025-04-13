@@ -14,6 +14,8 @@ function App() {
   const [name, setName] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("main");
   const [loggedIn,setLoginStatus] = useState(false) 
+  const [githubUsername, setGithubUsername] = useState("")
+
   
   const handleNameChange = (event) => setName(event.target.value);
   
@@ -28,14 +30,18 @@ function App() {
       const code = urlParams.get("code")
       if (code){
         try {
-          const response = await axios.post(`${IP}verifyCode`, code, {
-            headers: { 'Content-Type': 'application/json' },
+          const response = await axios.post(`${IP}verifyCode`, { code }, {
+            headers: { 'Content-Type': 'application/json' }
           });
+          
           const data = response.data
+          console.log(data)
           if(data.authenticated){
             setLoginStatus(true)
-          }
-        
+            console.log(data.authenticated)
+            localStorage.setItem("jwtToken", data.token);
+            
+          }  
       }
       catch(error){
         console.error("Login failed", error);
@@ -72,17 +78,32 @@ function App() {
     formData.append('branch', selectedBranch); // Append selected branch to form data
 
     setMessage("Your data is currently being processed and sent to GitHub");
+      if(localStorage.getItem("jwtToken")){
+        try {
+         const userToken = localStorage.getItem("jwtToken");
 
-    try {
-      const response = await axios.post(`${IP}upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setMessage(response.data.message);
-    } catch (error) {
-      setMessage(error.response?.data?.error || "An error occurred.");
-    }
+         const authorizationRes = await axios.post(`${IP}/verifyJwt`, {}, {
+          headers: {
+            "Authorization": `Bearer ${userToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if(!authorizationRes.data.authenticated){
+          setMessage("Authentication failed. Please log in again.");
+          return;
+        }
+        const response = await axios.post(`${IP}upload`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        setMessage(response.data.message);
+      }
+        catch (error) {
+        setMessage(error.response?.data?.error || "An error occurred.");
+      }
+  }
+  
   };
-
+  
   return (
     
       <div className="Container"> 
@@ -94,6 +115,7 @@ function App() {
               <h1>Welcome to the NMRLipids Upload Portal</h1>
             </header>
             <button onClick={githubLogin}>Github Login</button>
+            <h3>{githubUsername}</h3>
             <form onSubmit={handleSubmit} className="upload-form">
             <input
                 type="text"

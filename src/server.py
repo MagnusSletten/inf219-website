@@ -7,6 +7,8 @@ import tempfile
 import time 
 import yaml 
 import requests 
+import jwt
+
 app = Flask(__name__)
 CORS(app)
 
@@ -16,7 +18,7 @@ BASE_BRANCH = 'dev_cicd'
 WORKFLOW_BRANCH = 'dev_cicd'
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
-
+jwt_key = os.getenv("jwtkey")
 
 
 
@@ -28,13 +30,6 @@ def awake():
 @app.route('/verifyCode',methods=['POST', 'OPTIONS'])
 def verifyCode():
 
-    if request.method == 'OPTIONS':
-        response = jsonify({'message': 'Preflight passed'})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        return response, 200
-    
     code = request.get_json().get("code")
     if not code:
         return jsonify({"error": "Missing code parameter"}), 400
@@ -66,9 +61,26 @@ def verifyCode():
 
     username = user_info.get("login")
 
-    # You could also store the username in a session or skip it
-    return jsonify({"authenticated": True, "username": username})
+  
+    encoded = jwt.encode({"username":username}, jwt_key, algorithm="HS256")
+   
+    return jsonify({"authenticated": True, "token": encoded})
 
+@app.route("/verifyJwt",methods=['POST'])
+def verifyJwt(): 
+    auth_header = request.headers.get('authorization')
+    if(auth_header):
+        try:
+            token = auth_header.split(' ')[1]
+            decoded_token = jwt.decode(token,jwt_key,algorithms=["HS256"])
+            if("username" in decoded_token):
+                return jsonify({"authenticated":"true"})
+            return jsonify({"authenticated":"false"},401 )
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error":"Expired Signature"},),401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+    return jsonify({"error": "Authorization header missing"}), 400
 
 
 @app.route('/upload', methods=['POST'])
