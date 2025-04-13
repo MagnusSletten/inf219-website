@@ -25,7 +25,7 @@ ClientSecret = os.getenv("clientsecret")
 def awake():
     return "<h1> Server is awake!<h1>", 200
 
-@app.route('/verifyCode', methods=['POST'])
+@app.route('/verifyCode',methods=['POST', 'OPTIONS'])
 def verifyCode():
     code = request.get_json().get("code")
     if not code:

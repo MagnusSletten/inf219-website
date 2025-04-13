@@ -18,7 +18,7 @@ function App() {
   const handleNameChange = (event) => setName(event.target.value);
   
   function githubLogin(){
-    window.location.assign("https://github.com/login/oauth/authorize/?client_id=" + ClientID+`&scope=read:user`)
+    window.location.assign("https://github.com/login/oauth/authorize/?client_id=" + ClientID)
   }
 
   useEffect(() => {
