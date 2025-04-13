@@ -6,6 +6,7 @@ import utils
 import tempfile
 import time 
 import yaml 
+import requests 
 app = Flask(__name__)
 CORS(app)
 
@@ -13,11 +14,53 @@ CORS(app)
 REPO_NAME = 'MagnusSletten/Databank'
 BASE_BRANCH = 'dev_cicd'
 WORKFLOW_BRANCH = 'dev_cicd'
+ClientID =  "Ov23liS8svKowq4uyPcG"
+ClientSecret = os.getenv("clientsecret")
+
+
+
 
 
 @app.route('/awake', methods=['GET'])
 def awake():
     return "<h1> Server is awake!<h1>", 200
+
+@app.route('/verifyCode', methods=['POST'])
+def verifyCode():
+    code = request.get_json().get("code")
+    if not code:
+        return jsonify({"error": "Missing code parameter"}), 400
+
+    url = "https://github.com/login/oauth/access_token"
+
+    payload = {
+        "client_id": ClientID,
+        "client_secret": ClientSecret,
+        "code": code
+    }
+
+    headers = {
+        "Accept": "application/json"
+    }
+
+    response = requests.post(url, data=payload, headers=headers)
+    data = response.json()
+    access_token = data.get("access_token")
+
+    if not access_token:
+        return jsonify({"authenticated": False}), 401
+
+    # Get user info
+    user_info = requests.get(
+        "https://api.github.com/user",
+        headers={"Authorization": f"Bearer {access_token}"}
+    ).json()
+
+    username = user_info.get("login")
+
+    # You could also store the username in a session or skip it
+    return jsonify({"authenticated": True, "username": username})
+
 
 
 @app.route('/upload', methods=['POST'])
@@ -55,6 +98,8 @@ def upload_file():
     
 
 if __name__ == '__main__':
+    if not ClientSecret:
+        raise ValueError("Missing client secret in environment!")
     utils.git_setup()
     utils.authenticate_gh()
     app.run(host="0.0.0.0", port=5001, debug=True)
