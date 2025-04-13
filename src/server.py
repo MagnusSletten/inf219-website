@@ -27,6 +27,14 @@ def awake():
 
 @app.route('/verifyCode',methods=['POST', 'OPTIONS'])
 def verifyCode():
+
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'Preflight passed'})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        return response, 200
+    
     code = request.get_json().get("code")
     if not code:
         return jsonify({"error": "Missing code parameter"}), 400
