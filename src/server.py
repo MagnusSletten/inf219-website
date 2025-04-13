@@ -23,12 +23,15 @@ jwt_key = os.getenv("jwtkey")
 
 
 
-@app.route('/awake', methods=['GET'])
+@app.route('/awake', methods=['GET','OPTIONS'])
 def awake():
     return "<h1> Server is awake!<h1>", 200
 
 @app.route('/verifyCode',methods=['POST', 'OPTIONS'])
 def verifyCode():
+
+    if request.method == 'OPTIONS':
+       return '', 200
 
     code = request.get_json().get("code")
     if not code:
