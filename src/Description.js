@@ -1,5 +1,5 @@
 function Description(){
-    const text = "This is the NMRLipids interface for uploading info about simulations."
+    const text = ""
 
     return(
         <h3>{text}</h3>

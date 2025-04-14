@@ -28,6 +28,10 @@ function App() {
       const currUrl = window.location.search;
       const urlParams = new URLSearchParams(currUrl)
       const code = urlParams.get("code")
+      if(localStorage.getItem("jwtToken")){
+         setLoginStatus(true)
+        return; 
+      }
       if (code){
         try {
           const response = await axios.post(`${IP}verifyCode`, { code }, {
@@ -63,7 +67,7 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    userToken = localStorage.getItem("jwtToken")
+    const userToken = localStorage.getItem("jwtToken")
     if(!userToken){
       setMessage("Please log in through Github by clicking the Github Login Button")
       return; 
@@ -80,7 +84,7 @@ function App() {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('name', name);
-    formData.append('branch', selectedBranch); // Append selected branch to form data
+    formData.append('branch', selectedBranch); 
 
     setMessage("Your data is currently being processed and sent to GitHub");
         try {
@@ -109,8 +113,8 @@ function App() {
               <img src={logo} className="App-logo" alt="logo" />
               <h1>Welcome to the NMRLipids Upload Portal</h1>
             </header>
-            <button onClick={githubLogin}>Github Login</button>
-            <h3>{githubUsername}</h3>
+            {!loggedIn &&<button onClick={githubLogin} className='button'>Github Login</button>} 
+            {loggedIn &&
             <form onSubmit={handleSubmit} className="upload-form">
             <input
                 type="text"
@@ -141,7 +145,10 @@ function App() {
                   </button>
                   <button type="submit" className="button">Upload</button>
                   </div>
-            </form>
+            </form>}
+         {!loggedIn && (
+            <p>Please log in with GitHub to access the upload tool.</p>
+          )}
           </div>
         <div className="Right">
         <div className="description-content">

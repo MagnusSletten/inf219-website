@@ -36,7 +36,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install required Python packages
-RUN pip install Flask Flask-Cors PyYAML requests
+RUN pip install Flask Flask-Cors PyYAML requests pyjwt
 
 # Expose the port that Flask will run on
 EXPOSE 5001
