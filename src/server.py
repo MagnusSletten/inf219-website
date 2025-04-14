@@ -69,25 +69,27 @@ def verifyCode():
    
     return jsonify({"authenticated": True, "token": encoded})
 
-@app.route("/verifyJwt",methods=['POST'])
+
 def verifyJwt(): 
     auth_header = request.headers.get('authorization')
     if(auth_header):
         try:
             token = auth_header.split(' ')[1]
             decoded_token = jwt.decode(token,jwt_key,algorithms=["HS256"])
-            if("username" in decoded_token):
-                return jsonify({"authenticated":"true"})
-            return jsonify({"authenticated":"false"},401 )
+            return decoded_token, None,None       
         except jwt.ExpiredSignatureError:
-            return jsonify({"error":"Expired Signature"},),401
+            return None,jsonify({"error":"Expired Signature"},),401
         except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token"}), 401
-    return jsonify({"error": "Authorization header missing"}), 400
+            return None,jsonify({"error": "Invalid token"}), 401
+    return None,jsonify({"error": "Authorization header missing"}), 400
 
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+
+    decoded,error,err_code = verifyJwt()
+    if(error):
+        return error,err_code 
     BASE_BRANCH=request.form.get('branch')
    
     if 'file' not in request.files:

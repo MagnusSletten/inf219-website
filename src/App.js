@@ -63,6 +63,11 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    userToken = localStorage.getItem("jwtToken")
+    if(!userToken){
+      setMessage("Please log in through Github by clicking the Github Login Button")
+      return; 
+    }
     if (!file) {
       setMessage("Please select a file first.");
       return;
@@ -78,30 +83,20 @@ function App() {
     formData.append('branch', selectedBranch); // Append selected branch to form data
 
     setMessage("Your data is currently being processed and sent to GitHub");
-      if(localStorage.getItem("jwtToken")){
         try {
-         const userToken = localStorage.getItem("jwtToken");
-
-         const authorizationRes = await axios.post(`${IP}/verifyJwt`, {}, {
-          headers: {
-            "Authorization": `Bearer ${userToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        if(!authorizationRes.data.authenticated){
-          setMessage("Authentication failed. Please log in again.");
-          return;
-        }
+        const userToken = localStorage.getItem("jwtToken");
         const response = await axios.post(`${IP}upload`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+  
+          headers: { 
+            'Content-Type': 'multipart/form-data' ,
+            "Authorization": `Bearer ${userToken}`
+          },
         });
         setMessage(response.data.message);
       }
         catch (error) {
         setMessage(error.response?.data?.error || "An error occurred.");
       }
-  }
-  
   };
   
   return (
