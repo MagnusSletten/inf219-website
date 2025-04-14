@@ -23,11 +23,11 @@ jwt_key = os.getenv("jwtkey")
 
 
 
-@app.route('/awake', methods=['GET','OPTIONS'])
+@app.route('/app/awake', methods=['GET','OPTIONS'])
 def awake():
     return "<h1> Server is awake!<h1>", 200
 
-@app.route('/verifyCode',methods=['POST', 'OPTIONS'])
+@app.route('/app/verifyCode',methods=['POST', 'OPTIONS'])
 def verifyCode():
 
     if request.method == 'OPTIONS':
@@ -84,7 +84,7 @@ def verifyJwt():
     return None,jsonify({"error": "Authorization header missing"}), 400
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/app/upload', methods=['POST'])
 def upload_file():
 
     decoded,error,err_code = verifyJwt()

@@ -8,7 +8,7 @@ import Description from './Description';
 
 function App() {
   const ClientID = "Ov23liS8svKowq4uyPcG"; 
-  const IP = '/api/';
+  const IP = '/app/';
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("Upload your info.yaml file below:");
   const [name, setName] = useState("");
