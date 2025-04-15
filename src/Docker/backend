@@ -10,23 +10,12 @@ ARG website_branch="main"
 ENV FLASK_APP=server.py
 ENV FLASK_ENV=production
 
-# Set up the working directory for the repository
-WORKDIR /app/inf219-website
+# Create non-root user
+RUN useradd -m -s /bin/bash runner
 
-# Install git to allow cloning the repository
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
-# Clone the repository into /app/inf219-website
-RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-website.git .
-
-
-WORKDIR /Databank
-RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . && \
-    pip install --break-system-packages -e . 
-
-# Install GitHub CLI and other utilities
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Install git and required tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     curl \
     gnupg && \
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
@@ -35,13 +24,27 @@ RUN apt-get update && \
     apt-get install -y gh && \
     rm -rf /var/lib/apt/lists/*
 
+# Set up the working directory for the website and clone
+WORKDIR /app/inf219-website
+RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-website.git . \
+ && chown -R runner:runner /app
+
+# Clone the databank repo
+WORKDIR /Databank
+RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . && \
+    pip install --break-system-packages -e . && \
+    chown -R runner:runner /Databank
+
 # Install required Python packages
 RUN pip install Flask Flask-Cors PyYAML requests pyjwt
 
-# Expose the port that Flask will run on
+# Switch to the non-root user
+USER runner
+
+# Expose Flask port
 EXPOSE 5001
 
-# Define the command to run the app in the correct working directory
+# Set working directory back to site and launch app
 WORKDIR /app/inf219-website
 CMD ["python3", "src/server.py"]
 
