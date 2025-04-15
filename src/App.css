@@ -48,7 +48,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: calc(10px + 1.5vmin);
+  font-size: calc(7px + 1.5vmin);
   color: white;
   text-align:center
 }
