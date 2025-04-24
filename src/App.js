@@ -143,7 +143,7 @@ function App() {
           },
         });
         setMessage(response.data.message);
-        setPullRequestUrl(response.data.url || null);
+        setPullRequestUrl(response.data.pullUrl || null);
         
       }
         catch (error) {
