@@ -6,15 +6,37 @@ import BranchSelect from './BranchSelect';
 import Description from './Description';
 
 
+const initialState = {
+  file:           null,
+  message:        "Upload your info.yaml file below:",
+  name:           "",
+  selectedBranch: "main",
+  loggedIn:       false,
+  githubUsername: "",
+  loggedInMessage:""
+};
+
 function App() {
+
+  const {
+    file: defaultFile,
+    message: defaultMessage,
+    name: defaultName,
+    selectedBranch: defaultBranch,
+    loggedIn: defaultLoggedIn,
+    githubUsername: defaultUsername,
+    loggedInMessage: defaultLoggedInMessage
+  } = initialState;
+
   const ClientID = "Ov23liS8svKowq4uyPcG"; 
   const IP = '/app/';
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("Upload your info.yaml file below:");
-  const [name, setName] = useState("");
-  const [selectedBranch, setSelectedBranch] = useState("main");
-  const [loggedIn,setLoginStatus] = useState(false) 
-  const [githubUsername, setGithubUsername] = useState("")
+  const [file, setFile] = useState(defaultFile);
+  const [message, setMessage] = useState(defaultMessage);
+  const [name, setName] = useState(defaultName);
+  const [selectedBranch, setSelectedBranch] = useState(defaultBranch);
+  const [loggedIn, setLoginStatus]    = useState(defaultLoggedIn);
+  const [githubUsername, setGithubUsername] = useState(defaultUsername);
+  const [loggedInMessage,setLoggedInMessage]= useState(defaultLoggedInMessage);
 
   
   const handleNameChange = (event) => setName(event.target.value);
@@ -22,6 +44,23 @@ function App() {
   function githubLogin(){
     window.location.assign("https://github.com/login/oauth/authorize/?client_id=" + ClientID)
   }
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken")
+    localStorage.removeItem("username");
+
+    setFile(defaultFile);
+    setMessage(defaultMessage);
+    setName(defaultName);
+    setSelectedBranch(defaultBranch);
+    setLoginStatus(defaultLoggedIn);
+    setGithubUsername(defaultUsername);
+    setLoggedInMessage(defaultLoggedInMessage);
+    
+    window.history.replaceState(null, "", window.location.pathname);
+  
+  }
+ 
 
   useEffect(() => {
     const fetchAuth = async() => {
@@ -44,6 +83,13 @@ function App() {
             setLoginStatus(true)
             console.log(data.authenticated)
             localStorage.setItem("jwtToken", data.token);
+            if(data.username){
+              localStorage.setItem("username",data.username)
+              setLoggedInMessage(`Logged in as ${data.username}`)
+            }
+            else{
+              setLoggedInMessage(`Succesfully logged in but username was not available`)
+            }
             
           }  
       }
@@ -64,6 +110,8 @@ function App() {
   };
 
   const handleBranchChange = (event) => setSelectedBranch(event.target.value);
+
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -88,7 +136,6 @@ function App() {
 
     setMessage("Your data is currently being processed and sent to GitHub");
         try {
-        const userToken = localStorage.getItem("jwtToken");
         const response = await axios.post(`${IP}upload`, formData, {
   
           headers: { 
@@ -113,9 +160,11 @@ function App() {
               <img src={logo} className="App-logo" alt="logo" />
               <h1>Welcome to the NMRLipids Upload Portal</h1>
             </header>
-            {!loggedIn &&<button onClick={githubLogin} className='button'>Github Login</button>} 
-            {loggedIn &&
+            {!loggedIn && 
+            <button onClick={githubLogin} className='button'>Github Login</button>}
+            {loggedIn && 
             <form onSubmit={handleSubmit} className="upload-form">
+            <h3>{loggedInMessage}</h3>
             <input
                 type="text"
                 placeholder="Enter your name"
@@ -135,7 +184,8 @@ function App() {
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
                   />
-                <h3 className="upload-message" dangerouslySetInnerHTML={{ __html: message }} />
+                <h3 className="upload-message">{message}</h3>
+
                 <div className="Upload-buttons">
                 <button
                     type="button"
@@ -151,6 +201,8 @@ function App() {
           )}
           </div>
         <div className="Right">
+          {loggedIn &&
+          <button onClick={handleLogout} className='button'> Logout </button>}
         <div className="description-content">
           <Description />
         </div>
