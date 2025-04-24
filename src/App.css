@@ -12,8 +12,9 @@ html, body {
   
 }
 .Right {
+  display: flex;
+  flex-direction: column;
   
-
 }
 .App {
   display: flex;
@@ -114,6 +115,9 @@ html, body {
   transition: background-color 0.3s ease;
   height: 40px; /* Fixed height for equal height buttons */
   line-height: 20px; /* Adjust line height for vertical alignment */
+}
+.logoutSection{
+  align-self: center;
 }
 
 .button:hover {

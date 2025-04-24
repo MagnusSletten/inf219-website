@@ -1,5 +1,5 @@
 function Description(){
-    const text = "This is a description"
+    const text = ""
 
     return(
         <h3>{text}</h3>

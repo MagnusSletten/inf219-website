@@ -56,7 +56,7 @@ function App() {
     setLoginStatus(defaultLoggedIn);
     setGithubUsername(defaultUsername);
     setLoggedInMessage(defaultLoggedInMessage);
-    
+
     window.history.replaceState(null, "", window.location.pathname);
   
   }
@@ -201,8 +201,11 @@ function App() {
           )}
           </div>
         <div className="Right">
+          <div className="logoutSection">
           {loggedIn &&
           <button onClick={handleLogout} className='button'> Logout </button>}
+          </div>
+         
         <div className="description-content">
           <Description />
         </div>
