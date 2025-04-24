@@ -162,7 +162,7 @@ function App() {
             <button onClick={githubLogin} className='button'>Github Login</button>}
             {loggedIn && 
             <form onSubmit={handleSubmit} className="upload-form">
-            <h3>{loggedInMessage}</h3>
+            <h3 className='logInMessage'>{loggedInMessage}</h3>
             <input
                 type="text"
                 placeholder="Enter your name"
