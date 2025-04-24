@@ -69,7 +69,7 @@ function App() {
       const code = urlParams.get("code")
       if(localStorage.getItem("jwtToken")){
          setLoginStatus(true)
-         setLoggedInMessage(`Logged in on Github as ${data.username}`)
+         setLoggedInMessage(`Logged in on Github as ${localStorage.getItem("username")}`)
         return; 
       }
       if (code){
