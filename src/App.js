@@ -7,11 +7,11 @@ import Description from './Description';
 
 
 const initialState = {
-  file:           null,
-  message:        "Upload your info.yaml file below:",
-  name:           "",
+  file: null,
+  message: "Upload your info.yaml file below:",
+  name: "",
   selectedBranch: "main",
-  loggedIn:       false,
+  loggedIn: false,
   githubUsername: "",
   loggedInMessage:""
 };
@@ -85,7 +85,7 @@ function App() {
             localStorage.setItem("jwtToken", data.token);
             if(data.username){
               localStorage.setItem("username",data.username)
-              setLoggedInMessage(`Logged in as ${data.username}`)
+              setLoggedInMessage(`Logged in on Github as ${data.username}`)
             }
             else{
               setLoggedInMessage(`Succesfully logged in but username was not available`)
@@ -110,8 +110,6 @@ function App() {
   };
 
   const handleBranchChange = (event) => setSelectedBranch(event.target.value);
-
-  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
