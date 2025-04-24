@@ -25,12 +25,10 @@ function BranchSelect({ selectedBranch, setSelectedBranch, setMessage }) {
     fetchBranches();
   }, [setSelectedBranch, setMessage]); 
 
-  const handleBranchChange = (event) => setSelectedBranch(event.target.value);
-
   return (
     <>
       <h3 htmlFor="branch-select" className="dropdown-label"> Select a branch to upload to:</h3>
-      <select value={selectedBranch} onChange={handleBranchChange} className="branch-select">
+      <select value={selectedBranch} onChange={e => setSelectedBranch(e.target.value)} className="branch-select">
         {branches.map(branch => (
           <option key={branch} value={branch}>{branch}</option>
         ))}

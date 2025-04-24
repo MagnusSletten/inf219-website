@@ -69,7 +69,7 @@ function App() {
       const code = urlParams.get("code")
       if(localStorage.getItem("jwtToken")){
          setLoginStatus(true)
-         setLoggedInMessage(`Logged in on Github as ${localStorage.getItem("username")}`)
+         setLoggedInMessage(`Logged in to Github as ${localStorage.getItem("username")}`)
         return; 
       }
       if (code){
@@ -110,7 +110,6 @@ function App() {
     setMessage(selectedFile ? `You have selected ${selectedFile.name} for upload` : "Upload your info.yaml file here");
   };
 
-  const handleBranchChange = (event) => setSelectedBranch(event.target.value);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -204,7 +203,6 @@ function App() {
           {loggedIn &&
           <button onClick={handleLogout} className='button'> Logout </button>}
           </div>
-         
         <div className="description-content">
           <Description />
         </div>
