@@ -37,6 +37,7 @@ function App() {
   const [loggedIn, setLoginStatus]    = useState(defaultLoggedIn);
   const [githubUsername, setGithubUsername] = useState(defaultUsername);
   const [loggedInMessage,setLoggedInMessage]= useState(defaultLoggedInMessage);
+  const [pullRequestUrl, setPullRequestUrl] = useState(null);
 
   
   const handleNameChange = (event) => setName(event.target.value);
@@ -142,6 +143,8 @@ function App() {
           },
         });
         setMessage(response.data.message);
+        setPullRequestUrl(response.data.url || null);
+        
       }
         catch (error) {
         setMessage(error.response?.data?.error || "An error occurred.");
@@ -182,7 +185,17 @@ function App() {
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
                   />
-                <h3 className="upload-message">{message}</h3>
+                <h3 className="upload-message">
+                {message}
+                {pullRequestUrl && (
+                  <>
+                    {" "}
+                    <a href={pullRequestUrl} target="_blank" rel="noopener noreferrer">
+                      View Pull Request
+                    </a>
+                  </>
+                )}
+              </h3>
 
                 <div className="Upload-buttons">
                 <button

@@ -110,12 +110,12 @@ def upload_file():
         return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
 
    
-    repo_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
+    pr_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
     
     utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,BASE_BRANCH)
             
     return jsonify({
-        'message': f"File uploaded successfully! Here is the pull request: <a href='{repo_url}' target='_blank'>View Pull Request</a>"
+        'message': f"File uploaded successfully! Here is the pull request:", "pullUrl": f"{pr_url}"
 }), 200
     
 
