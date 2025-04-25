@@ -8,6 +8,7 @@ import time
 import yaml 
 import requests 
 import jwt
+from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
 CORS(app)
@@ -84,10 +85,35 @@ def verifyJwt():
     return None,jsonify({"error": "Authorization header missing"}), 400
 
 
+def authorizeToken(access_token):
+    url = f"https://api.github.com/applications/{ClientID}/token"
+    headers = {"Accept": "application/vnd.github+json"}
+    data = {"access_token": access_token}
+
+    try:
+        response = requests.post(url, auth=HTTPBasicAuth(ClientID, ClientSecret), headers=headers, json=data)
+        
+        if response.status_code == 200:
+            return response.json(), None, 200
+        elif response.status_code == 404:
+            return None, "Token not found or invalid", 404
+        elif response.status_code == 401:
+            return None, "Bad credentials (check client_id and client_secret)", 401
+        else:
+            return None, f"Unexpected error: {response.text}", response.status_code
+
+    except Exception as e:
+        return None, str(e), 500
+ 
 @app.route('/app/upload', methods=['POST'])
 def upload_file():
+    token_pre = request.headers.get('authorization')
+    token = token_pre.split(' ')[1] if token_pre and " " in token_pre else None
 
-    decoded,error,err_code = verifyJwt()
+    if not token:
+        return jsonify({'error': 'Missing or malformed Authorization header'}), 400
+
+    response,error,err_code = authorizeToken(token)
     if(error):
         return error,err_code 
     BASE_BRANCH=request.form.get('branch')

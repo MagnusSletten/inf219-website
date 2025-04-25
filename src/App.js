@@ -47,7 +47,7 @@ function App() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken")
+    localStorage.removeItem("githubToken")
     localStorage.removeItem("username");
 
     setFile(defaultFile);
@@ -68,7 +68,7 @@ function App() {
       const currUrl = window.location.search;
       const urlParams = new URLSearchParams(currUrl)
       const code = urlParams.get("code")
-      if(localStorage.getItem("jwtToken")){
+      if(localStorage.getItem("githubToken")){
          setLoginStatus(true)
          setLoggedInMessage(`Logged in to Github as ${localStorage.getItem("username")}`)
         return; 
@@ -84,7 +84,7 @@ function App() {
           if(data.authenticated){
             setLoginStatus(true)
             console.log(data.authenticated)
-            localStorage.setItem("jwtToken", data.token);
+            localStorage.setItem("githubToken", data.token);
             if(data.username){
               localStorage.setItem("username",data.username)
               setLoggedInMessage(`Logged in on Github as ${data.username}`)
@@ -114,7 +114,7 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const userToken = localStorage.getItem("jwtToken")
+    const userToken = localStorage.getItem("githubToken")
     if(!userToken){
       setMessage("Please log in through Github by clicking the Github Login Button")
       return; 
