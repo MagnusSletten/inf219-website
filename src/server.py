@@ -65,10 +65,8 @@ def verifyCode():
 
     username = user_info.get("login")
 
-  
-    encoded = jwt.encode({"username":username}, jwt_key, algorithm="HS256")
    
-    return jsonify({"authenticated": True, "token": encoded, "username":username})
+    return jsonify({"authenticated": True, "token": access_token, "username":username})
 
 
 def verifyJwt(): 
