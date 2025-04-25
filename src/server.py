@@ -130,7 +130,13 @@ def upload_file():
     if  not file.filename.endswith(('.yaml', '.yml')):
         return jsonify({'error': 'File type not allowed, only .yaml or .yml files are accepted'}), 400
     
-    if not utils.is_input_valid(file):
+    try:
+        yaml_data = yaml.safe_load(file.read().decode("utf-8"))
+        file.seek(0)
+    except:
+        return jsonify({'error': f'Invalid YAML file'}), 400
+ 
+    if not utils.is_input_valid(yaml_data):
         return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
 
    

@@ -7,12 +7,10 @@ from werkzeug.datastructures import FileStorage
 from DatabankLib.databankLibrary import parse_valid_config_settings, YamlBadConfigException
 
 
-def is_input_valid(info_yaml_file:FileStorage ):
-    
+def is_input_valid(info_yaml_dict:dict ):
     """Validate the input file for the required keys and values."""
     try:
-        info_yaml = yaml.safe_load(info_yaml_file.read().decode("utf-8"))
-        sim, files = parse_valid_config_settings(info_yaml)
+        sim, files = parse_valid_config_settings(info_yaml_dict)
     except:
         return False
 
