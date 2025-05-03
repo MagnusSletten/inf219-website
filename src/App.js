@@ -5,7 +5,7 @@ import logo from './logo.svg';
 import BranchSelect from './BranchSelect';
 import Description from './Description';
 
-
+// Store default state variables so resetting is simple
 const initialState = {
   file: null,
   message: "Upload your info.yaml file below:",
@@ -17,7 +17,7 @@ const initialState = {
 };
 
 function App() {
-
+  // Deconstructing the initial state so retrieving variables is simple witha alises 
   const {
     file: defaultFile,
     message: defaultMessage,
@@ -196,7 +196,6 @@ function App() {
                   </>
                 )}
               </h3>
-
                 <div className="Upload-buttons">
                 <button
                     type="button"

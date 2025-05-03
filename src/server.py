@@ -64,6 +64,7 @@ def verifyCode():
     ).json()
 
     username = user_info.get("login")
+    print(username)
 
    
     return jsonify({"authenticated": True, "token": access_token, "username":username})
