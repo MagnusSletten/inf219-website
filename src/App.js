@@ -129,7 +129,7 @@ export default function App() {
 const handleSubmit = async e => {
   e.preventDefault();
 
-  // Build composition map: key = name
+  // 1) Build your YAML payload
   const compMap = Object.fromEntries(
     data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
   );
@@ -146,9 +146,7 @@ const handleSubmit = async e => {
     return;
   }
 
-  setMessage('Submitting your data...');
-
-  // Build multipart form, using the key "file" to match request.files['file']
+  // 2) Wrap it in FormData under “file” (so Flask sees request.files['file'])
   const formData = new FormData();
   formData.append(
     'file',
@@ -158,22 +156,37 @@ const handleSubmit = async e => {
   formData.append('name', userName);
   formData.append('branch', branch);
 
+  setMessage('Submitting your data…');
+
   try {
     const response = await axios.post(
-      `${IP}upload`,
+      `${IP}upload`,      // make sure IP ends in “/app/” (or use `/app/upload` explicitly)
       formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          // leave Content-Type unset so axios can add the proper multipart boundary
+          // omit Content-Type so axios adds the correct multipart boundary
         },
+        // allow us to see EVERY response, not just 2xx
+        validateStatus: status => true,
       }
     );
+
+    console.log('📥 server responded:', response.status, response.data);
+
+    if (response.status !== 200) {
+      // show the exact error JSON (or string) you got back
+      const err = response.data?.error || JSON.stringify(response.data);
+      setMessage(`Error ${response.status}: ${err}`);
+      return;
+    }
+
     setMessage(response.data.message);
     setPullRequestUrl(response.data.pullUrl || null);
 
-  } catch (error) {
-    setMessage(error.response?.data?.error || 'An error occurred.');
+  } catch (err) {
+    console.error('🔥 upload failed:', err);
+    setMessage('Unexpected error – check console for details.');
   }
 };
 
