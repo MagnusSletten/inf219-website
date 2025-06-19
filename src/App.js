@@ -134,7 +134,7 @@ const handleSubmit = async e => {
     data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
   );
   const payload = { ...data, COMPOSITION: compMap };
-  const yaml = YAML.stringify(payload);
+  const yamlString = YAML.stringify(payload);
 
   const token = localStorage.githubToken;
   if (!token) {
@@ -148,11 +148,11 @@ const handleSubmit = async e => {
 
   setMessage('Submitting your data...');
 
-  // Build multipart form
+  // Build multipart form, using the key "file" to match request.files['file']
   const formData = new FormData();
   formData.append(
-    'yaml',
-    new Blob([yaml], { type: 'application/x-yaml' }),
+    'file',
+    new Blob([yamlString], { type: 'application/x-yaml' }),
     'data.yaml'
   );
   formData.append('name', userName);
@@ -164,17 +164,19 @@ const handleSubmit = async e => {
       formData,
       {
         headers: {
-          Authorization: `Bearer ${token}`
-          // note: DO NOT set Content-Type here—axios will add the correct multipart boundary
+          Authorization: `Bearer ${token}`,
+          // leave Content-Type unset so axios can add the proper multipart boundary
         },
       }
     );
     setMessage(response.data.message);
     setPullRequestUrl(response.data.pullUrl || null);
+
   } catch (error) {
     setMessage(error.response?.data?.error || 'An error occurred.');
   }
 };
+
 
   return (
     <div className="Container">
