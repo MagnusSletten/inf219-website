@@ -126,39 +126,55 @@ export default function App() {
     });
   };
 
-    /* Submit: upload YAML to GitHub */  /* Submit: upload YAML to GitHub */
-  const handleSubmit = async e => {
-    e.preventDefault();
-    // Build composition map: key = name
-    const compMap = Object.fromEntries(
-      data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
+const handleSubmit = async e => {
+  e.preventDefault();
+
+  // Build composition map: key = name
+  const compMap = Object.fromEntries(
+    data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
+  );
+  const payload = { ...data, COMPOSITION: compMap };
+  const yaml = YAML.stringify(payload);
+
+  const token = localStorage.githubToken;
+  if (!token) {
+    setMessage('Please login first');
+    return;
+  }
+  if (!userName) {
+    setMessage('Please enter your name.');
+    return;
+  }
+
+  setMessage('Submitting your data...');
+
+  // Build multipart form
+  const formData = new FormData();
+  formData.append(
+    'yaml',
+    new Blob([yaml], { type: 'application/x-yaml' }),
+    'data.yaml'
+  );
+  formData.append('name', userName);
+  formData.append('branch', branch);
+
+  try {
+    const response = await axios.post(
+      `${IP}upload`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+          // note: DO NOT set Content-Type here—axios will add the correct multipart boundary
+        },
+      }
     );
-    const payload = { ...data, COMPOSITION: compMap };
-    const yaml = YAML.stringify(payload);
-
-    const token = localStorage.githubToken;
-    if (!token) {
-      setMessage('Please login first');
-      return;
-    }
-    if (!userName) {
-      setMessage('Please enter your name.');
-      return;
-    }
-
-    setMessage('Submitting your data...');
-    try {
-      const response = await axios.post(
-        `${IP}upload`,
-        { yaml, name: userName, branch },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMessage(response.data.message);
-      setPullRequestUrl(response.data.pullUrl || null);
-    } catch (error) {
-      setMessage(error.response?.data?.error || 'An error occurred.');
-    }
-  };
+    setMessage(response.data.message);
+    setPullRequestUrl(response.data.pullUrl || null);
+  } catch (error) {
+    setMessage(error.response?.data?.error || 'An error occurred.');
+  }
+};
 
   return (
     <div className="Container">
