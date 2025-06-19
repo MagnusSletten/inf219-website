@@ -3,6 +3,8 @@ FROM python:3.10-slim
 
 # Argument for repository URL
 ARG REPO_URL="https://github.com/MagnusSletten/BilayerData"
+ARG Databank_URL="https://github.com/MagnusSletten/Databank"
+ARG Databank_branch="main"
 ARG START_BRANCH_NAME="main"
 ARG website_branch="main"
 
@@ -35,6 +37,13 @@ RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-w
  && chown -R runner:runner /app
 
 # Clone the databank repo
+ENV NMLDB_DATA_PATH=/Databank/Scripts/tests/Data \
+    NMLDB_SIMU_PATH=/Databank/Scripts/tests/Data/Simulations.1
+# Clone the databank repo
+WORKDIR /Databank
+RUN git clone --branch ${Databank_branch} ${Databank_URL} . && \
+    pip install --break-system-packages -e .
+
 WORKDIR /BilayerData
 RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . 
 

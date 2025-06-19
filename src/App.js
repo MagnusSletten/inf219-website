@@ -149,7 +149,7 @@ export default function App() {
     setMessage('Submitting your data...');
     try {
       const response = await axios.post(
-        `${IP}uploadYaml`,
+        `${IP}upload`,
         { yaml, name: userName, branch },
         { headers: { Authorization: `Bearer ${token}` } }
       );
