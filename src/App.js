@@ -129,24 +129,31 @@ export default function App() {
 const handleSubmit = async e => {
   e.preventDefault();
 
-  // 1) Build your YAML payload
+  console.log('🔔 handleSubmit called');
+  console.log('⚙️ branch:', branch, 'userName:', userName);
+
+  // Build your YAML payload
   const compMap = Object.fromEntries(
     data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
   );
   const payload = { ...data, COMPOSITION: compMap };
   const yamlString = YAML.stringify(payload);
+  console.log('📦 payload YAML:\n', yamlString);
 
   const token = localStorage.githubToken;
   if (!token) {
-    setMessage('Please login first');
+    setMessage('🚫 Please login first');
     return;
   }
   if (!userName) {
-    setMessage('Please enter your name.');
+    setMessage('🚫 Please enter your name.');
     return;
   }
 
-  // 2) Wrap it in FormData under “file” (so Flask sees request.files['file'])
+  const uploadUrl = `${IP.replace(/\/+$/, '')}/app/upload`;
+  console.log('🔗 Uploading to:', uploadUrl);
+
+  // Build the form
   const formData = new FormData();
   formData.append(
     'file',
@@ -156,39 +163,38 @@ const handleSubmit = async e => {
   formData.append('name', userName);
   formData.append('branch', branch);
 
-  setMessage('Submitting your data…');
+  // Dump out all form entries so you can see them
+  for (let [key, val] of formData.entries()) {
+    console.log('📮 formData entry:', key, val);
+  }
+
+  setMessage('⏳ Submitting your data…');
 
   try {
-    const response = await axios.post(
-      `${IP}upload`,      // make sure IP ends in “/app/” (or use `/app/upload` explicitly)
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // omit Content-Type so axios adds the correct multipart boundary
-        },
-        // allow us to see EVERY response, not just 2xx
-        validateStatus: status => true,
-      }
-    );
+    const response = await axios.post(uploadUrl, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+      validateStatus: status => status < 600, // get *everything* back
+    });
 
-    console.log('📥 server responded:', response.status, response.data);
+    console.log('📥 response status:', response.status);
+    console.log('📥 response data:', response.data);
 
-    if (response.status !== 200) {
-      // show the exact error JSON (or string) you got back
-      const err = response.data?.error || JSON.stringify(response.data);
-      setMessage(`Error ${response.status}: ${err}`);
-      return;
+    if (response.status === 200) {
+      setMessage(response.data.message);
+      setPullRequestUrl(response.data.pullUrl || null);
+    } else {
+      setMessage(`❌ ${response.status}: ${response.data?.error || JSON.stringify(response.data)}`);
     }
-
-    setMessage(response.data.message);
-    setPullRequestUrl(response.data.pullUrl || null);
-
   } catch (err) {
-    console.error('🔥 upload failed:', err);
-    setMessage('Unexpected error – check console for details.');
+    console.error('🔥 Request threw:', err);
+    if (err.request && !err.response) {
+      setMessage('❌ No response from server. Is it running at ' + uploadUrl + '?');
+    } else {
+      setMessage('❌ Request error: ' + err.message);
+    }
   }
 };
+
 
 
   return (
