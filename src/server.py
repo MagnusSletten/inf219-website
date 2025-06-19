@@ -15,8 +15,8 @@ CORS(app)
 
 # Constants
 REPO_NAME = 'MagnusSletten/Databank'
-BASE_BRANCH = 'dev_cicd'
-WORKFLOW_BRANCH = 'dev_cicd'
+BASE_BRANCH = 'dev_info_process'
+WORKFLOW_BRANCH = 'dev_info_process'
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")

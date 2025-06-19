@@ -5,8 +5,7 @@ import yaml
 import time
 from werkzeug.datastructures import FileStorage
 from DatabankLib.databankLibrary import parse_valid_config_settings, YamlBadConfigException
-
-
+import sys 
 
 def is_input_valid(info_yaml_dict:dict ):
     """Validate the input file for the required keys and values."""
@@ -33,13 +32,7 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     subprocess.run(["git", "checkout", base_branch], check=True)
     subprocess.run(["git", "pull"])
 
-    # Determine the next numbered directory within info_files
-    info_files_path = os.path.join("Scripts", "BuildDatabank", "info_files")
-    existing_folders = [
-        int(folder) for folder in os.listdir(info_files_path) if folder.isdigit()
-    ]
-    next_folder_number = max(existing_folders, default=0) + 1
-    new_folder_path = os.path.join(info_files_path, str(next_folder_number))
+    new_folder_path = os.path.join("user_data")
 
     # Create the new folder
     os.makedirs(new_folder_path, exist_ok=True)
@@ -51,25 +44,31 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
  
     # Set the remote URL to include the token (for push)
-    subprocess.run(["git", "remote", "set-url", "origin", f"https://{GITHUB_TOKEN}@github.com/{repo_name}.git"], check=True)
+    run_command(f"git remote set-url origin https://{GITHUB_TOKEN}@github.com/{repo_name}.git")
 
     # Create and switch to a new branch
     branch_name = branch_out()
 
     # Add, commit, and push the file to the repository
-    subprocess.run(["git", "add", save_path], check=True)
-    subprocess.run(["git", "commit", "-m", "Add new file"], check=True)
-    subprocess.run(["git", "push", "--set-upstream", "origin", branch_name], check=True)
-    print("Pushed file to new branch")
+    run_command(f"git add {save_path}")
+    run_command("git" "commit" "-m" "Add new file")
+    run_command(f"git push --set-upstream origin {branch_name}")
 
-    # Create a pull request
-    pr_url = create_pull_request(repo_name, base_branch, branch_name, contributer_name)
+    print("Pushed file to new branch")
+    pr_url = "default"
+    #Create a pull request
+    #pr_url = create_pull_request(repo_name, base_branch, branch_name, contributer_name)
 
     # Return to the original directory
     os.chdir("..")
     return pr_url, branch_name
 
-
+def run_command(command, error_message="Command failed", working_dir=None):
+    try:
+        subprocess.run(command, shell=True, check=True, cwd=working_dir)
+    except subprocess.CalledProcessError:
+        print(error_message)
+        sys.exit(1)
 
 def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
     """Create a pull request using GitHub CLI."""
@@ -90,7 +89,6 @@ def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
     pr_url = result.stdout.strip()
     print(f"Pull request created: {pr_url}")
     return pr_url
-
 
 def branch_out():
     """Create a new branch in the repository, and changes to the new branch."""
