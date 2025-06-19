@@ -2,8 +2,8 @@
 FROM python:3.10-slim
 
 # Argument for repository URL
-ARG REPO_URL="https://github.com/MagnusSletten/Databank"
-ARG START_BRANCH_NAME="dev_cicd"
+ARG REPO_URL="https://github.com/MagnusSletten/BilayerData"
+ARG START_BRANCH_NAME="main"
 ARG website_branch="main"
 
 # Set environment variables for Flask
@@ -23,6 +23,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get update && \
     apt-get install -y gh && \
     rm -rf /var/lib/apt/lists/*
+# Install required Python packages
+RUN pip install Flask Flask-Cors PyYAML requests pyjwt
+
+# Switch to the non-root user
+USER runner
 
 # Set up the working directory for the website and clone
 WORKDIR /app/inf219-website
@@ -30,16 +35,8 @@ RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-w
  && chown -R runner:runner /app
 
 # Clone the databank repo
-WORKDIR /Databank
-RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . && \
-    pip install --break-system-packages -e . && \
-    chown -R runner:runner /Databank
-
-# Install required Python packages
-RUN pip install Flask Flask-Cors PyYAML requests pyjwt
-
-# Switch to the non-root user
-USER runner
+WORKDIR /BilayerData
+RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . 
 
 # Expose Flask port
 EXPOSE 5001

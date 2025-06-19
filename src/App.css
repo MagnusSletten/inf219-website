@@ -148,6 +148,18 @@ html, body {
 .upload-form p {
   margin: 8px 0;
   font-size: 16px;
-  color: #333;
+  color: lightblue;
   text-align: center;
+}
+.rjsf-form .form-group .form-control {
+  width: 100%;
+}
+.rjsf-form .required > label:after {
+  content: '';
+}
+.form-wrapper {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: lightblue;
 }

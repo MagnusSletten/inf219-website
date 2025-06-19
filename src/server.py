@@ -14,7 +14,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Constants
-REPO_NAME = 'MagnusSletten/Databank'
+REPO_NAME = 'MagnusSletten/BilayerData'
 BASE_BRANCH = 'dev_info_process'
 WORKFLOW_BRANCH = 'dev_info_process'
 ClientID =  "Ov23liS8svKowq4uyPcG"
@@ -141,10 +141,8 @@ def upload_file():
         return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
 
    
-    pr_url,branch_name = utils.push_to_repo(file,name,"/Databank", REPO_NAME, BASE_BRANCH)
-    
-    utils.trigger_addData_workflow(REPO_NAME,branch_name,BASE_BRANCH,BASE_BRANCH)
-            
+    pr_url,branch_name = utils.push_to_repo(file,name,"/BilayerData", REPO_NAME, BASE_BRANCH)
+               
     return jsonify({
         'message': f"File uploaded successfully! Here is the pull request:", "pullUrl": f"{pr_url}"
 }), 200

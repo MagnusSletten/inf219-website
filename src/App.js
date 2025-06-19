@@ -1,229 +1,248 @@
 import React, { useState, useEffect } from 'react';
+import YAML from 'yaml';
 import axios from 'axios';
 import './App.css';
 import logo from './logo.svg';
 import BranchSelect from './BranchSelect';
 import Description from './Description';
 
-// Store default state variables so resetting is simple
-const initialState = {
-  file: null,
-  message: "Upload your info.yaml file below:",
-  name: "",
-  selectedBranch: "main",
-  loggedIn: false,
-  githubUsername: "",
-  loggedInMessage:""
-};
+// Scalar fields
+const scalarFields = [
+  'DOI','SOFTWARE','TRJ','TPR','PREEQTIME','TIMELEFTOUT','DIR_WRK',
+  'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','AUTHORS_CONTACT',
+  'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR','TRAJECTORY_SIZE'
+];
 
-function App() {
-  // Deconstructing the initial state so retrieving variables is simple witha alises 
-  const {
-    file: defaultFile,
-    message: defaultMessage,
-    name: defaultName,
-    selectedBranch: defaultBranch,
-    loggedIn: defaultLoggedIn,
-    githubUsername: defaultUsername,
-    loggedInMessage: defaultLoggedInMessage
-  } = initialState;
-
-  const ClientID = "Ov23liS8svKowq4uyPcG"; 
+export default function App() {
+  const ClientID = 'Ov23liS8svKowq4uyPcG';
   const IP = '/app/';
-  const [file, setFile] = useState(defaultFile);
-  const [message, setMessage] = useState(defaultMessage);
-  const [name, setName] = useState(defaultName);
-  const [selectedBranch, setSelectedBranch] = useState(defaultBranch);
-  const [loggedIn, setLoginStatus]    = useState(defaultLoggedIn);
-  const [githubUsername, setGithubUsername] = useState(defaultUsername);
-  const [loggedInMessage,setLoggedInMessage]= useState(defaultLoggedInMessage);
+
+  /* Auth & User */
+  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedInMessage, setLoggedInMessage] = useState('');
+  const [userName, setUserName] = useState('');
+  const [branch, setBranch] = useState('main');
+  const [message, setMessage] = useState('Fill in the form');
   const [pullRequestUrl, setPullRequestUrl] = useState(null);
 
-  
-  const handleNameChange = (event) => setName(event.target.value);
-  
-  function githubLogin(){
-    window.location.assign("https://github.com/login/oauth/authorize/?client_id=" + ClientID)
-  }
+  /* YAML Preview */
+  const [yamlPreview, setYamlPreview] = useState('');
+
+  /* Form state */
+  const [data, setData] = useState({
+    DOI: '',
+    SOFTWARE: '',
+    TRJ: '',
+    TPR: '',
+    PREEQTIME: 0,
+    TIMELEFTOUT: 0,
+    DIR_WRK: '',
+    UNITEDATOM_DICT: '',
+    TYPEOFSYSTEM: '',
+    SYSTEM: '',
+    PUBLICATION: '',
+    AUTHORS_CONTACT: '',
+    BATCHID: '',
+    SOFTWARE_VERSION: '',
+    FF: '',
+    FF_SOURCE: '',
+    FF_DATE: '',
+    CPT: '',
+    LOG: '',
+    TOP: '',
+    EDR: '',
+    TRAJECTORY_SIZE: '',
+    COMPOSITION: [{ name: '', mapping: '' }]
+  });
+
+  /* GitHub OAuth */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (localStorage.githubToken) {
+      setLoggedIn(true);
+      setLoggedInMessage(`Logged in as ${localStorage.username}`);
+      return;
+    }
+    if (code) {
+      axios.post(`${IP}verifyCode`, { code })
+        .then(res => {
+          if (res.data.authenticated) {
+            localStorage.githubToken = res.data.token;
+            localStorage.username = res.data.username || '';
+            setLoggedIn(true);
+            setLoggedInMessage(`Logged in as ${res.data.username || ''}`);
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        })
+        .catch(() => setMessage('GitHub login failed'));
+    }
+  }, []);
+
+  const githubLogin = () => {
+    window.location.assign(`https://github.com/login/oauth/authorize/?client_id=${ClientID}`);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("githubToken")
-    localStorage.removeItem("username");
-
-    setFile(defaultFile);
-    setMessage(defaultMessage);
-    setName(defaultName);
-    setSelectedBranch(defaultBranch);
-    setLoginStatus(defaultLoggedIn);
-    setGithubUsername(defaultUsername);
-    setLoggedInMessage(defaultLoggedInMessage);
-
-    window.history.replaceState(null, "", window.location.pathname);
-  
-  }
- 
-
-  useEffect(() => {
-    const fetchAuth = async() => {
-      const currUrl = window.location.search;
-      const urlParams = new URLSearchParams(currUrl)
-      const code = urlParams.get("code")
-      if(localStorage.getItem("githubToken")){
-         setLoginStatus(true)
-         setLoggedInMessage(`Logged in to Github as ${localStorage.getItem("username")}`)
-        return; 
-      }
-      if (code){
-        try {
-          const response = await axios.post(`${IP}verifyCode`, { code }, {
-            headers: { 'Content-Type': 'application/json' }
-          });
-          
-          const data = response.data
-          console.log(data)
-          if(data.authenticated){
-            setLoginStatus(true)
-            console.log(data.authenticated)
-            localStorage.setItem("githubToken", data.token);
-            if(data.username){
-              localStorage.setItem("username",data.username)
-              setLoggedInMessage(`Logged in on Github as ${data.username}`)
-            }
-            else{
-              setLoggedInMessage(`Succesfully logged in but username was not available`)
-            }
-            
-          }  
-      }
-      catch(error){
-        console.error("Login failed", error);
-      }
-
-      }
-    }
-  fetchAuth();
-
-  },[])
-
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-    setMessage(selectedFile ? `You have selected ${selectedFile.name} for upload` : "Upload your info.yaml file here");
+    localStorage.clear();
+    setLoggedIn(false);
+    setLoggedInMessage('');
+    setMessage('Fill in the form');
+    setUserName('');
+    setBranch('main');
+    setPullRequestUrl(null);
+    setYamlPreview('');
+    setData({
+      DOI: '', SOFTWARE: '', TRJ: '', TPR: '', PREEQTIME: 0, TIMELEFTOUT: 0,
+      DIR_WRK: '', PUBLICATION: '', AUTHORS_CONTACT: '', SYSTEM: '', SOFTWARE_VERSION: '',
+      FF: '', FF_SOURCE: '', FF_DATE: '', CPT: '', LOG: '', TOP: '',
+      COMPOSITION: [{ name: '', mapping: '' }]
+    });
   };
 
+  /* Form handlers */
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setData(d => ({ ...d, [name]: value }));
+  };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const userToken = localStorage.getItem("githubToken")
-    if(!userToken){
-      setMessage("Please log in through Github by clicking the Github Login Button")
-      return; 
-    }
-    if (!file) {
-      setMessage("Please select a file first.");
+  const handleCompChange = (idx, field) => e => {
+    const items = [...data.COMPOSITION];
+    items[idx][field] = e.target.value;
+    setData(d => ({ ...d, COMPOSITION: items }));
+  };
+
+  const addComp = () => {
+    setData(d => ({
+      ...d,
+      COMPOSITION: [...d.COMPOSITION, { name: '', mapping: '' }]
+    }));
+  };
+
+  const removeComp = idx => {
+    setData(d => {
+      const items = d.COMPOSITION.filter((_, i) => i !== idx);
+      return { ...d, COMPOSITION: items.length ? items : [{ name: '', mapping: '' }] };
+    });
+  };
+
+    /* Submit: upload YAML to GitHub */  /* Submit: upload YAML to GitHub */
+  const handleSubmit = async e => {
+    e.preventDefault();
+    // Build composition map: key = name
+    const compMap = Object.fromEntries(
+      data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
+    );
+    const payload = { ...data, COMPOSITION: compMap };
+    const yaml = YAML.stringify(payload);
+
+    const token = localStorage.githubToken;
+    if (!token) {
+      setMessage('Please login first');
       return;
     }
-    if (!name) {
-      setMessage("Please enter your name.");
+    if (!userName) {
+      setMessage('Please enter your name.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('name', name);
-    formData.append('branch', selectedBranch); 
-
-    setMessage("Your data is currently being processed and sent to GitHub");
-        try {
-        const response = await axios.post(`${IP}upload`, formData, {
-  
-          headers: { 
-            'Content-Type': 'multipart/form-data' ,
-            "Authorization": `Bearer ${userToken}`
-          },
-        });
-        setMessage(response.data.message);
-        setPullRequestUrl(response.data.pullUrl || null);
-        
-      }
-        catch (error) {
-        setMessage(error.response?.data?.error || "An error occurred.");
-      }
+    setMessage('Submitting your data...');
+    try {
+      const response = await axios.post(
+        `${IP}uploadYaml`,
+        { yaml, name: userName, branch },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage(response.data.message);
+      setPullRequestUrl(response.data.pullUrl || null);
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'An error occurred.');
+    }
   };
-  
+
   return (
-    
-      <div className="Container"> 
-        <div className="Left">
-        </div>
-        <div className="App"> 
-            <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <h1>Welcome to the NMRLipids Upload Portal</h1>
-            </header>
-            {!loggedIn && 
-            <button onClick={githubLogin} className='button'>Github Login</button>}
-            {loggedIn && 
-            <form onSubmit={handleSubmit} className="upload-form">
+    <div className="Container">
+      <div className="Left" />
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h1>Welcome to NMRLipids Upload Portal</h1>
+        </header>
+
+        {!loggedIn ? (
+          <button onClick={githubLogin} className="button centered">GitHub Login</button>
+        ) : (
+          <button onClick={handleLogout} className="button centered">Logout</button>
+        )}
+
+        {loggedIn && (
+          <form onSubmit={handleSubmit} className="upload-form">
             <h3 className='logInMessage'>{loggedInMessage}</h3>
             <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={handleNameChange}
-                className="name-input"
-              />
-            <BranchSelect 
-                selectedBranch={selectedBranch} 
-                setSelectedBranch={setSelectedBranch} 
-                setMessage={setMessage} 
-            />        
+              type="text"
+              placeholder="Enter your name"
+              value={userName}
+              onChange={e => setUserName(e.target.value)}
+              className="name-input centered"
+            />
+            <BranchSelect
+              selectedBranch={branch}
+              setSelectedBranch={setBranch}
+              setMessage={setMessage}
+            />
+            <p className="upload-message centered">{message}</p>
+
+            {scalarFields.map(key => (
+              <div key={key} className="field centered" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 12 }}>
+                <label style={{ marginBottom: 4 }}>{key}</label>
                 <input
-                    id="file-upload"
-                    type="file"
-                    className="file-input"
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
+                  name={key}
+                  value={data[key]}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                />
+              </div>
+            ))}
+
+            <fieldset className="centered">
+              <legend>COMPOSITION</legend>
+              {data.COMPOSITION.map((c, i) => (
+                <div key={i} className="comp-row centered" style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <input
+                    placeholder="Name"
+                    value={c.name}
+                    onChange={handleCompChange(i,'name')}
                   />
-                <h3 className="upload-message">
-                {message}
-                {pullRequestUrl && (
-                  <>
-                    {" "}
-                    <a href={pullRequestUrl} target="_blank" rel="noopener noreferrer">
-                      View Pull Request
-                    </a>
-                  </>
-                )}
-              </h3>
-                <div className="Upload-buttons">
-                <button
-                    type="button"
-                    className="button"
-                    onClick={() => document.getElementById('file-upload').click()}>
-                    Select file
-                  </button>
-                  <button type="submit" className="button">Upload</button>
-                  </div>
-            </form>}
-         {!loggedIn && (
-            <p>Please log in with GitHub to access the upload tool.</p>
-          )}
-          </div>
-        <div className="Right">
-          <div className="logoutSection">
-          {loggedIn &&
-          <button onClick={handleLogout} className='button'> Logout </button>}
-          </div>
-        <div className="description-content">
-          <Description />
-        </div>
-        </div>   
+                  <input
+                    placeholder="Mapping"
+                    value={c.mapping}
+                    onChange={handleCompChange(i,'mapping')}
+                  />
+                  <button type="button" onClick={() => removeComp(i)}>✕</button>
+                </div>
+              ))}
+              <button type="button" onClick={addComp} className="button centered">+ Add Composition</button>
+            </fieldset>
+
+            <button type="submit" className="button centered">Submit</button>
+
+            {yamlPreview && (
+              <pre style={{ background: '#f4f4f4', padding: 10, whiteSpace: 'pre-wrap', marginTop: 12 }}>
+                {yamlPreview}
+              </pre>
+            )}
+
+            {pullRequestUrl && (
+              <p className="centered">
+                <a href={pullRequestUrl} target="_blank" rel="noopener noreferrer">View Pull Request</a>
+              </p>
+            )}
+          </form>
+        )}
       </div>
-    );
-    
-  }
-export default App;
-
-
-
+      <div className="Right">
+        <Description />
+      </div>
+    </div>
+  );
+}

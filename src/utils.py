@@ -32,7 +32,7 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     subprocess.run(["git", "checkout", base_branch], check=True)
     subprocess.run(["git", "pull"])
 
-    new_folder_path = os.path.join("user_data")
+    new_folder_path = os.path.join("UserData")
 
     # Create the new folder
     os.makedirs(new_folder_path, exist_ok=True)
@@ -141,7 +141,7 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 
 
-def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_pipeline"):
+def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_info_process"):
     print("Starting to trigger the workflow...")  
 
     """Triggers the AddData GitHub workflow using the GitHub CLI."""
