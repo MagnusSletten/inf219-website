@@ -150,7 +150,7 @@ const handleSubmit = async e => {
 
   try {
     const resp = await axios.post(
-      `${IP.replace(/\/+$/, '')}/app/upload`,
+      `${IP}upload`,
       formData,
       {
         headers: { Authorization: `Bearer ${localStorage.githubToken}` },
