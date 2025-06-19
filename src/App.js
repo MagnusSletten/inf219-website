@@ -128,73 +128,46 @@ export default function App() {
 
 const handleSubmit = async e => {
   e.preventDefault();
-
   console.log('🔔 handleSubmit called');
-  console.log('⚙️ branch:', branch, 'userName:', userName);
 
-  // Build your YAML payload
+  // Build YAML
   const compMap = Object.fromEntries(
     data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
   );
-  const payload = { ...data, COMPOSITION: compMap };
-  const yamlString = YAML.stringify(payload);
+  const yamlString = YAML.stringify({ ...data, COMPOSITION: compMap });
   console.log('📦 payload YAML:\n', yamlString);
 
-  const token = localStorage.githubToken;
-  if (!token) {
-    setMessage('🚫 Please login first');
-    return;
-  }
-  if (!userName) {
-    setMessage('🚫 Please enter your name.');
-    return;
-  }
-
-  const uploadUrl = `${IP.replace(/\/+$/, '')}/app/upload`;
-  console.log('🔗 Uploading to:', uploadUrl);
-
-  // Build the form
+  // Build form
   const formData = new FormData();
-  formData.append(
-    'file',
-    new Blob([yamlString], { type: 'application/x-yaml' }),
-    'data.yaml'
-  );
+  formData.append('file', new Blob([yamlString], { type: 'application/x-yaml' }), 'data.yaml');
   formData.append('name', userName);
   formData.append('branch', branch);
 
-  // Dump out all form entries so you can see them
+  // **LOG EVERY ENTRY**
   for (let [key, val] of formData.entries()) {
     console.log('📮 formData entry:', key, val);
   }
 
-  setMessage('⏳ Submitting your data…');
-
   try {
-    const response = await axios.post(uploadUrl, formData, {
-      headers: { Authorization: `Bearer ${token}` },
-      validateStatus: status => status < 600, // get *everything* back
-    });
-
-    console.log('📥 response status:', response.status);
-    console.log('📥 response data:', response.data);
-
-    if (response.status === 200) {
-      setMessage(response.data.message);
-      setPullRequestUrl(response.data.pullUrl || null);
-    } else {
-      setMessage(`❌ ${response.status}: ${response.data?.error || JSON.stringify(response.data)}`);
-    }
+    const resp = await axios.post(
+      `${IP.replace(/\/+$/, '')}/app/upload`,
+      formData,
+      {
+        headers: { Authorization: `Bearer ${localStorage.githubToken}` },
+        validateStatus: () => true,
+      }
+    );
+    console.log('📥 response:', resp.status, resp.data);
+    setMessage(
+      resp.status === 200
+        ? resp.data.message
+        : `Error ${resp.status}: ${resp.data?.error || JSON.stringify(resp.data)}`
+    );
   } catch (err) {
-    console.error('🔥 Request threw:', err);
-    if (err.request && !err.response) {
-      setMessage('❌ No response from server. Is it running at ' + uploadUrl + '?');
-    } else {
-      setMessage('❌ Request error: ' + err.message);
-    }
+    console.error('🔥 request threw:', err);
+    setMessage('Network or CORS error—see console.');
   }
 };
-
 
 
   return (
