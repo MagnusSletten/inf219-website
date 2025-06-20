@@ -53,7 +53,7 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
 
     # Add, commit, and push the file to the repository
     run_command(f"git add {save_path}")
-    run_command("git" "commit" "-m" "Add new file")
+    run_command("git commit -m 'Add new file'")
     run_command(f"git push --set-upstream origin {branch_name}")
 
     print("Pushed file to new branch")
