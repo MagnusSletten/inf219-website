@@ -139,25 +139,30 @@ const handleSubmit = async e => {
 
   // Build form
   const formData = new FormData();
-  formData.append('file', new Blob([yamlString], { type: 'application/x-yaml' }), 'data.yaml');
+  formData.append(
+    'file',
+    new Blob([yamlString], { type: 'application/x-yaml' }),
+    'data.yaml'
+  );
   formData.append('name', userName);
   formData.append('branch', branch);
 
-  // **LOG EVERY ENTRY**
+  // LOG EVERY ENTRY
   for (let [key, val] of formData.entries()) {
     console.log('📮 formData entry:', key, val);
   }
 
+  // *** FIX: use a single “/app/upload” path ***
+  const uploadUrl = '/app/upload';
+  console.log('🔗 Uploading to:', uploadUrl);
+
   try {
-    const resp = await axios.post(
-      `${IP}upload`,
-      formData,
-      {
-        headers: { Authorization: `Bearer ${localStorage.githubToken}` },
-        validateStatus: () => true,
-      }
-    );
+    const resp = await axios.post(uploadUrl, formData, {
+      headers: { Authorization: `Bearer ${localStorage.githubToken}` },
+      validateStatus: () => true,
+    });
     console.log('📥 response:', resp.status, resp.data);
+
     setMessage(
       resp.status === 200
         ? resp.data.message
@@ -168,6 +173,7 @@ const handleSubmit = async e => {
     setMessage('Network or CORS error—see console.');
   }
 };
+
 
 
   return (
