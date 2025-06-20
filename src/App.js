@@ -18,7 +18,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [loggedInMessage, setLoggedInMessage] = useState('');
   const [userName, setUserName] = useState('');
   const [branch, setBranch] = useState('main');
