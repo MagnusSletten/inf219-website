@@ -16,6 +16,8 @@ def is_input_valid(info_yaml_dict:dict ):
 
     return True
 
+def git_pull():
+    subprocess.run(["git", "fetch"])
 
 
 def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
