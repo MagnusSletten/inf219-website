@@ -15,8 +15,8 @@ CORS(app)
 
 # Constants
 REPO_NAME = 'MagnusSletten/BilayerData'
-BASE_BRANCH = 'dev_info_process'
-WORKFLOW_BRANCH = 'dev_info_process'
+BASE_BRANCH = 'main'
+WORKFLOW_BRANCH = 'main'
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
