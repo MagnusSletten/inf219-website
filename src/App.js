@@ -246,67 +246,77 @@ const handleSubmit = async e => {
               ))}
             </div>
 
-      <fieldset>
-        <legend>COMPOSITION</legend>
+              <fieldset>
+          <legend>COMPOSITION</legend>
 
-        {Object.entries(data.COMPOSITION).map(([lipidId, info]) => (
-          <div key={lipidId} className="comp-row">
-            {/* 1) select lipid */}
-            <select
-              value={lipidId}
-              onChange={e =>
-                setData(draft => {
-                  const newId = e.target.value;
-                  // move the object under the new key
-                  draft.COMPOSITION[newId] = draft.COMPOSITION[lipidId];
-                  delete draft.COMPOSITION[lipidId];
-                })
-              }
-            >
-              <option value="" disabled>Select lipid…</option>
-              {compositionList.map(id => (
-                <option key={id} value={id}>{id}</option>
-              ))}
-            </select>
+          {Object.entries(data.COMPOSITION).map(([lipidId, info]) => (
+            <div key={lipidId} className="comp-row">
+              {/* 1) select lipid */}
+              <select
+                value={lipidId}
+                onChange={e =>
+                  setData(draft => {
+                    const newId = e.target.value;
+                    const old = draft.COMPOSITION[lipidId];
+                    delete draft.COMPOSITION[lipidId];
+                    draft.COMPOSITION[newId] = old;
+                  })
+                }
+              >
+                <option value="" disabled>Select lipid…</option>
+                {compositionList.map(id => (
+                  <option key={id} value={id}>{id}</option>
+                ))}
+              </select>
 
-            {/* 2) mapping input */}
-            <input
-              placeholder="Mapping file"
-              value={info.MAPPING}
-              onChange={e =>
-                setData(draft => {
-                  draft.COMPOSITION[lipidId].MAPPING = e.target.value;
-                })
-              }
-            />
+              {/* 2) NAME input */}
+              <input
+                placeholder="NAME"
+                value={info.NAME || lipidId}
+                onChange={e =>
+                  setData(draft => {
+                    draft.COMPOSITION[lipidId].NAME = e.target.value;
+                  })
+                }
+              />
 
-            {/* 3) remove */}
-            <button
-              type="button"
-              onClick={() =>
-                setData(draft => {
-                  delete draft.COMPOSITION[lipidId];
-                })
-              }
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+              {/* 3) mapping input */}
+              <input
+                placeholder="MAPPING"
+                value={info.MAPPING}
+                onChange={e =>
+                  setData(draft => {
+                    draft.COMPOSITION[lipidId].MAPPING = e.target.value;
+                  })
+                }
+              />
 
-        {/* add a blank entry under an empty key */}
-        <button
-          type="button"
-          onClick={() =>
-            setData(draft => {
-              draft.COMPOSITION[''] = { MAPPING: '' };
-            })
-          }
-        >
-          + Add Composition
-        </button>
-      </fieldset>
+              {/* 4) remove */}
+              <button
+                type="button"
+                onClick={() =>
+                  setData(draft => {
+                    delete draft.COMPOSITION[lipidId];
+                  })
+                }
+              >
+                ✕
+              </button>
+            </div>
+          ))}
 
+          {/* add a blank entry */}
+          <button
+            type="button"
+            onClick={() =>
+              setData(draft => {
+                draft.COMPOSITION[''] = { NAME: '', MAPPING: '' };
+              })
+            }
+          >
+            + Add Composition
+          </button>
+        </fieldset>
             <button type="submit" className="button centered">Submit</button>
 
             {pullRequestUrl && (
