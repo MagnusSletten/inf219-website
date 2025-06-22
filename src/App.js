@@ -176,13 +176,30 @@ const handleSubmit = async e => {
     branch
   };
 
-  await axios.post('/app/upload', jsonPayload, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.githubToken}`
-    }
-  });
-};
+  console.log('📤 Sending payload:', jsonPayload);
+
+  try {
+    const resp = await axios.post('/app/upload', jsonPayload, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.githubToken}`
+      }
+    });
+    console.log('✅ Upload succeeded:', resp.data);
+    setMessage('Upload succeeded!');
+  } catch (err) {
+    console.error(
+      '❌ Upload failed:',
+      err.response?.status,
+      err.response?.data
+    );
+    setMessage(
+      `Upload failed: ${
+        err.response?.data?.error || err.message
+      }`
+    );
+  }
+};;
 
 
 
