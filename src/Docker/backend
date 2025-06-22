@@ -26,7 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get install -y gh && \
     rm -rf /var/lib/apt/lists/*
 # Install required Python packages
-RUN pip install Flask Flask-Cors PyYAML requests pyjwt
+
+RUN pip install Flask Flask-Cors PyYAML requests pyjwt PyGithub
 
 # Switch to the non-root user
 USER runner
@@ -43,9 +44,6 @@ ENV NMLDB_DATA_PATH=/Databank/Scripts/tests/Data \
 WORKDIR /Databank
 RUN git clone --branch ${Databank_branch} ${Databank_URL} . && \
     pip install --break-system-packages -e .
-
-WORKDIR /BilayerData
-RUN git clone --branch ${START_BRANCH_NAME} ${REPO_URL} . 
 
 # Expose Flask port
 EXPOSE 5001

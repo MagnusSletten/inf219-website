@@ -5,6 +5,7 @@ import './App.css';
 import logo from './logo.svg';
 import BranchSelect from './BranchSelect';
 import Description from './Description';
+import { useImmer } from 'use-immer';
 
 // Scalar fields
 const scalarFields = [
@@ -12,13 +13,66 @@ const scalarFields = [
   'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','AUTHORS_CONTACT',
   'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR','TRAJECTORY_SIZE'
 ];
+const compositionList = [
+  'POPC',
+  'POPG',
+  'POPS',
+  'POPE',
+  'PYPC',
+  'PAzePCprot',
+  'PAzePCdeprot',
+  'DMPC',
+  'DPPC',
+  'DPPE',
+  'DPPG',
+  'DEPC',
+  'DRPC',
+  'DYPC',
+  'DLPC',
+  'DLIPC',
+  'DOG',
+  'DOPC',
+  'DOPE',
+  'DDOPC',
+  'DOPS',
+  'DSPC',
+  'DAPC',
+  'SLiPC',
+  'DMTAP',
+  'GM1',
+  'SOPC',
+  'POPI',
+  'SAPI',
+  'SAPI24',
+  'SLPI',
+  'SDG',
+  'SDPE',
+  'SM16',
+  'SM18',
+  'TOCL',
+  'TLCL',
+  'CER',
+  'CER180',
+  'CHOL',
+  'DCHOL',
+  'DHMDMAB',
+  'DPPGK',
+  'POT',
+  'SOD',
+  'CLA',
+  'CAL',
+  'CES',
+  'C20',
+  'SOL'
+];
+
 
 export default function App() {
   const ClientID = 'Ov23liS8svKowq4uyPcG';
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [loggedInMessage, setLoggedInMessage] = useState('');
   const [userName, setUserName] = useState('');
   const [branch, setBranch] = useState('main');
@@ -29,7 +83,7 @@ export default function App() {
   const [yamlPreview, setYamlPreview] = useState('');
 
   /* Form state */
-  const [data, setData] = useState({
+  const [data, setData] = useImmer({
     DOI: '',
     SOFTWARE: '',
     TRJ: '',
@@ -51,9 +105,20 @@ export default function App() {
     LOG: '',
     TOP: '',
     EDR: '',
-    TRAJECTORY_SIZE: '',
-    COMPOSITION: [{ name: '', mapping: '' }]
+    COMPOSITION: {}
+    // key: nmrlipids-name   value: { name: string, mapping_file: string }
+    // this starts empty
+    
   });
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+/* scalar values */
+  
+// 1) change any scalar
+const handleChange = e => {
+  const { name, value } = e.target;
+  setData(draft => { draft[name] = value });
+};
+
 
   /* GitHub OAuth */
   useEffect(() => {
@@ -100,78 +165,23 @@ export default function App() {
     });
   };
 
-  /* Form handlers */
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setData(d => ({ ...d, [name]: value }));
-  };
 
-  const handleCompChange = (idx, field) => e => {
-    const items = [...data.COMPOSITION];
-    items[idx][field] = e.target.value;
-    setData(d => ({ ...d, COMPOSITION: items }));
-  };
-
-  const addComp = () => {
-    setData(d => ({
-      ...d,
-      COMPOSITION: [...d.COMPOSITION, { name: '', mapping: '' }]
-    }));
-  };
-
-  const removeComp = idx => {
-    setData(d => {
-      const items = d.COMPOSITION.filter((_, i) => i !== idx);
-      return { ...d, COMPOSITION: items.length ? items : [{ name: '', mapping: '' }] };
-    });
-  };
 
 const handleSubmit = async e => {
   e.preventDefault();
-  console.log('🔔 handleSubmit called');
 
-  // Build YAML
-  const compMap = Object.fromEntries(
-    data.COMPOSITION.map(c => [c.name, { NAME: c.name, MAPPING: c.mapping }])
-  );
-  const yamlString = YAML.stringify({ ...data, COMPOSITION: compMap });
-  console.log('📦 payload YAML:\n', yamlString);
+  const jsonPayload = {
+    ...data,
+    userName,
+    branch
+  };
 
-  // Build form
-  const formData = new FormData();
-  formData.append(
-    'file',
-    new Blob([yamlString], { type: 'application/x-yaml' }),
-    'data.yaml'
-  );
-  formData.append('name', userName);
-  formData.append('branch', branch);
-
-  // LOG EVERY ENTRY
-  for (let [key, val] of formData.entries()) {
-    console.log('📮 formData entry:', key, val);
-  }
-
-  // *** FIX: use a single “/app/upload” path ***
-  const uploadUrl = '/app/upload';
-  console.log('🔗 Uploading to:', uploadUrl);
-
-  try {
-    const resp = await axios.post(uploadUrl, formData, {
-      headers: { Authorization: `Bearer ${localStorage.githubToken}` },
-      validateStatus: () => true,
-    });
-    console.log('📥 response:', resp.status, resp.data);
-
-    setMessage(
-      resp.status === 200
-        ? resp.data.message
-        : `Error ${resp.status}: ${resp.data?.error || JSON.stringify(resp.data)}`
-    );
-  } catch (err) {
-    console.error('🔥 request threw:', err);
-    setMessage('Network or CORS error—see console.');
-  }
+  await axios.post('/app/upload', jsonPayload, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.githubToken}`
+    }
+  });
 };
 
 
@@ -204,49 +214,85 @@ const handleSubmit = async e => {
             <BranchSelect
               selectedBranch={branch}
               setSelectedBranch={setBranch}
-              setMessage={setMessage}
-            />
+              setMessage={setMessage}/>
+
             <p className="upload-message centered">{message}</p>
 
-            {scalarFields.map(key => (
-              <div key={key} className="field centered" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 12 }}>
-                <label style={{ marginBottom: 4 }}>{key}</label>
-                <input
-                  name={key}
-                  value={data[key]}
-                  onChange={handleChange}
-                  style={{ width: '100%' }}
-                />
-              </div>
-            ))}
-
-            <fieldset className="centered">
-              <legend>COMPOSITION</legend>
-              {data.COMPOSITION.map((c, i) => (
-                <div key={i} className="comp-row centered" style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <div className="scalar-fields">
+              {scalarFields.map(key => (
+                <div key={key} className="field">
+                  <label>{key}</label>
                   <input
-                    placeholder="Name"
-                    value={c.name}
-                    onChange={handleCompChange(i,'name')}
+                    name={key}
+                    value={data[key]}
+                    onChange={handleChange}
                   />
-                  <input
-                    placeholder="Mapping"
-                    value={c.mapping}
-                    onChange={handleCompChange(i,'mapping')}
-                  />
-                  <button type="button" onClick={() => removeComp(i)}>✕</button>
                 </div>
               ))}
-              <button type="button" onClick={addComp} className="button centered">+ Add Composition</button>
-            </fieldset>
+            </div>
+
+      <fieldset>
+        <legend>COMPOSITION</legend>
+
+        {Object.entries(data.COMPOSITION).map(([lipidId, info]) => (
+          <div key={lipidId} className="comp-row">
+            {/* 1) select lipid */}
+            <select
+              value={lipidId}
+              onChange={e =>
+                setData(draft => {
+                  const newId = e.target.value;
+                  // move the object under the new key
+                  draft.COMPOSITION[newId] = draft.COMPOSITION[lipidId];
+                  delete draft.COMPOSITION[lipidId];
+                })
+              }
+            >
+              <option value="" disabled>Select lipid…</option>
+              {compositionList.map(id => (
+                <option key={id} value={id}>{id}</option>
+              ))}
+            </select>
+
+            {/* 2) mapping input */}
+            <input
+              placeholder="Mapping file"
+              value={info.MAPPING}
+              onChange={e =>
+                setData(draft => {
+                  draft.COMPOSITION[lipidId].MAPPING = e.target.value;
+                })
+              }
+            />
+
+            {/* 3) remove */}
+            <button
+              type="button"
+              onClick={() =>
+                setData(draft => {
+                  delete draft.COMPOSITION[lipidId];
+                })
+              }
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        {/* add a blank entry under an empty key */}
+        <button
+          type="button"
+          onClick={() =>
+            setData(draft => {
+              draft.COMPOSITION[''] = { MAPPING: '' };
+            })
+          }
+        >
+          + Add Composition
+        </button>
+      </fieldset>
 
             <button type="submit" className="button centered">Submit</button>
-
-            {yamlPreview && (
-              <pre style={{ background: '#f4f4f4', padding: 10, whiteSpace: 'pre-wrap', marginTop: 12 }}>
-                {yamlPreview}
-              </pre>
-            )}
 
             {pullRequestUrl && (
               <p className="centered">

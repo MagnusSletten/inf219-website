@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const DataRepo = "MagnusSletten/BilayerData"
+
 function BranchSelect({ selectedBranch, setSelectedBranch, setMessage }) {  
   const [branches, setBranches] = useState([]); 
 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('https://api.github.com/repos/MagnusSletten/Databank/branches');
+        const response = await axios.get(`https://api.github.com/repos/${DataRepo}/branches`);
         const branchNames = response.data.map(branch => branch.name);
         setBranches(branchNames);
 
@@ -38,3 +40,4 @@ function BranchSelect({ selectedBranch, setSelectedBranch, setMessage }) {
 }
 
 export default BranchSelect;
+

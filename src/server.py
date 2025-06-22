@@ -9,17 +9,19 @@ import yaml
 import requests 
 import jwt
 from requests.auth import HTTPBasicAuth
+import base64
+from github import Github
+from github import Auth
 
 app = Flask(__name__)
 CORS(app)
 
 # Constants
-REPO_NAME = 'MagnusSletten/BilayerData'
-BASE_BRANCH = 'main'
-WORKFLOW_BRANCH = 'main'
+
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
+
 
 
 
@@ -115,41 +117,30 @@ def upload_file():
     response,error,err_code = authorizeToken(token)
     if(error):
         return error,err_code 
-    BASE_BRANCH=request.form.get('branch')
-   
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part in the request'}), 400
+    if not request.is_json:
+        return jsonify({'error': 'Content-Type must be application/json'}), 400
 
-    file = request.files['file']
-    name = request.form.get("name")
-    if file.filename == '':
-        return jsonify({'error': 'No file selected for uploading'}), 400
+    data = request.get_json()
+    if data is None:
+        return jsonify({'error': 'Malformed or empty JSON body'}), 400
 
-    if not file:
-        return jsonify({'error': 'File not found in the request'}), 400
-    
-    if  not file.filename.endswith(('.yaml', '.yml')):
-        return jsonify({'error': 'File type not allowed, only .yaml or .yml files are accepted'}), 400
-    
-    try:
-        yaml_data = yaml.safe_load(file.read().decode("utf-8"))
-        file.seek(0)
-    except:
-        return jsonify({'error': f'Invalid YAML file'}), 400
- 
-    if not utils.is_input_valid(yaml_data):
-        return jsonify({'error': 'File validation failed, check the required keys and values'}), 400
+    user_name   = data.pop('userName', None)
+    base_branch = data.pop('branch',   None)
+    if not user_name or not base_branch:
+        return jsonify({'error': 'Missing userName or branch in JSON'}), 400
 
-   
-    pr_url,branch_name = utils.push_to_repo(file,name,"/BilayerData", REPO_NAME, BASE_BRANCH)
-               
-    return jsonify({
-        'message': f"File uploaded successfully! Here is the pull request:", "pullUrl": f"{pr_url}"
-}), 200
+
+    # 4) Validate against your existing schema
+    if not utils.is_input_valid(data):
+        return jsonify({'error': 'Validation failed'}), 400
+
+
+    # — push via API —
+    url, branch = utils.push_to_repo_yaml(data, user_name, base_branch)
+
+    return jsonify(message="Uploaded!", pullUrl=url), 200
     
 
-        
-    
 
 if __name__ == '__main__':
     if not ClientSecret:

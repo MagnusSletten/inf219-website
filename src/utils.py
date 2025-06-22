@@ -6,6 +6,22 @@ import time
 from werkzeug.datastructures import FileStorage
 from DatabankLib.databankLibrary import parse_valid_config_settings, YamlBadConfigException
 import sys 
+import requests 
+from github import Github
+from github import Auth
+
+REPO_NAME = 'MagnusSletten/BilayerData'
+BASE_BRANCH = 'main'
+WORKFLOW_BRANCH = 'main'
+ClientID =  "Ov23liS8svKowq4uyPcG"
+ClientSecret = os.getenv("clientsecret")
+jwt_key = os.getenv("jwtkey")
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+gh   = Github(GITHUB_TOKEN)
+repo = gh.get_repo(f"{REPO_NAME}")
+
 
 def is_input_valid(info_yaml_dict:dict ):
     """Validate the input file for the required keys and values."""
@@ -64,6 +80,8 @@ def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, ba
     # Return to the original directory
     os.chdir("..")
     return pr_url, branch_name
+
+
 
 def run_command(command, error_message="Command failed", working_dir=None):
     try:
@@ -168,3 +186,45 @@ def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name,
     except subprocess.CalledProcessError as e:
         print(f"Error triggering workflow: {e.stderr}")
         return None
+
+
+def branch_out_py(base_branch: str) -> str:
+    ts         = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    new_branch = f"bot/info_yaml_{ts}"
+
+    # 1) Get the commit SHA of the base branch
+    source = repo.get_branch(base_branch)
+    sha    = source.commit.sha
+
+    # 2) Create the new branch ref
+    repo.create_git_ref(ref=f"refs/heads/{new_branch}", sha=sha)
+
+    return new_branch
+
+
+def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str, str]:
+    """
+    1) Create a branch via branch_out_py()
+    2) Dump data → YAML
+    3) Commit it to UserData/<user_name>.yaml on that branch
+    Returns (commit_html_url, new_branch)
+    """
+    # 1) Create feature branch
+    new_branch = branch_out_py(base_branch)
+
+    # 2) Dump to YAML text
+    yaml_text = yaml.safe_dump(data, sort_keys=False, width=120)
+    path      = f"UserData/{user_name}.yaml"
+    message   = f"Add {user_name}.yaml"
+
+    # 3) Create the file on GitHub
+    file = repo.create_file(
+        path=path,
+        message=message,
+        content=yaml_text,
+        branch=new_branch
+    )
+
+    # 4) Return the commit URL and branch name
+    commit_html_url = file["content"]["html_url"]
+    return commit_html_url, new_branch
