@@ -188,18 +188,16 @@ const handleSubmit = async e => {
     console.log('✅ Upload succeeded:', resp.data);
     setMessage('Upload succeeded!');
   } catch (err) {
-    console.error(
-      '❌ Upload failed:',
-      err.response?.status,
-      err.response?.data
-    );
-    setMessage(
-      `Upload failed: ${
-        err.response?.data?.error || err.message
-      }`
-    );
+    // If the server returned JSON, this will log it
+    if (err.response) {
+      console.error('❌ Server responded with:', err.response.status, err.response.data);
+      setMessage(`Upload failed: ${err.response.data.error}`);
+    } else {
+      console.error('❌ Network or other error', err);
+      setMessage(`Upload failed: ${err.message}`);
+    }
   }
-};;
+};
 
 
 
