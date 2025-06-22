@@ -203,28 +203,17 @@ def branch_out_py(base_branch: str) -> str:
 
 
 def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str, str]:
-    """
-    1) Create a branch via branch_out_py()
-    2) Dump data → YAML
-    3) Commit it to UserData/<user_name>.yaml on that branch
-    Returns (commit_html_url, new_branch)
-    """
-    # 1) Create feature branch
     new_branch = branch_out_py(base_branch)
+    yaml_text  = yaml.safe_dump(data, sort_keys=False, width=120)
+    path       = f"UserData/{user_name}.yaml"
+    message    = f"Add {user_name}.yaml"
 
-    # 2) Dump to YAML text
-    yaml_text = yaml.safe_dump(data, sort_keys=False, width=120)
-    path      = f"UserData/{user_name}.yaml"
-    message   = f"Add {user_name}.yaml"
-
-    # 3) Create the file on GitHub
-    file = repo.create_file(
+    created = repo.create_file(
         path=path,
         message=message,
         content=yaml_text,
         branch=new_branch
     )
 
-    # 4) Return the commit URL and branch name
-    commit_html_url = file["content"]["html_url"]
+    commit_html_url = created.content.html_url
     return commit_html_url, new_branch
