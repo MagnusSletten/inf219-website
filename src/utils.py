@@ -80,8 +80,8 @@ def branch_out(base_branch: str) -> str:
 def push_to_repo_yaml(data: dict, user_name: str) -> tuple[str, str]:
     new_branch = branch_out(WORK_BASE_BRANCH)
     yaml_text  = yaml.safe_dump(data, sort_keys=False, width=120)
-    path       = f"UserData/{user_name}.yaml"
-    message    = f"Add {user_name}.yaml"
+    path       = f"UserData/info.yml"
+    message    = f"Add {user_name}.yml"
 
     response = repo_work.create_file(
         path=path,
