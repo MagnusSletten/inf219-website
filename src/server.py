@@ -135,8 +135,8 @@ def upload_file():
         return jsonify({'error': 'Validation failed'}), 400
 
 
-    # — push via API —
-    url, branch = utils.push_to_repo_yaml(data, user_name, base_branch)
+
+    url = utils.create_pull_request_to_target()
 
     return jsonify(message="Uploaded!", pullUrl=url), 200
     

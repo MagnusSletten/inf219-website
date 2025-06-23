@@ -11,6 +11,7 @@ from github import Github
 from github import Auth
 
 REPO_NAME = 'MagnusSletten/BilayerData'
+PULL_REQUEST_TARGET_REPO = 'MagnusPriv/BilayerData'
 BASE_BRANCH = 'main'
 WORKFLOW_BRANCH = 'main'
 ClientID =  "Ov23liS8svKowq4uyPcG"
@@ -18,9 +19,12 @@ ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TARGET_TOKEN = os.getenv("GITHUB_TARGET_TOKEN")
 
 gh   = Github(GITHUB_TOKEN)
 repo = gh.get_repo(f"{REPO_NAME}")
+
+gh_target= Github(GITHUB_TARGET_TOKEN)
 
 
 def is_input_valid(info_yaml_dict:dict ):
@@ -32,56 +36,6 @@ def is_input_valid(info_yaml_dict:dict ):
 
     return True
 
-def git_pull():
-    subprocess.run(["git", "fetch"])
-
-
-def push_to_repo(file: FileStorage, contributer_name, repo_folder, repo_name, base_branch):
-    """Push the file content to the specified repository."""
-    
-    # Retrieve the GitHub token from environment variables
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-    if not GITHUB_TOKEN:
-        raise ValueError("GITHUB_TOKEN environment variable not set")
-
-    # Change to the repository folder
-    os.chdir(repo_folder)
-    subprocess.run(["git", "fetch"])
-    subprocess.run(["git", "checkout", base_branch], check=True)
-    subprocess.run(["git", "pull"])
-
-    new_folder_path = os.path.join("UserData")
-
-    # Create the new folder
-    os.makedirs(new_folder_path, exist_ok=True)
-
-    # Save the file in the new folder
-    save_path = os.path.join(new_folder_path, file.filename)
-    file.save(save_path)
-    print(f"Saved file to {save_path}")
-
- 
-    # Set the remote URL to include the token (for push)
-    run_command(f"git remote set-url origin https://{GITHUB_TOKEN}@github.com/{repo_name}.git")
-
-    # Create and switch to a new branch
-    branch_name = branch_out()
-
-    # Add, commit, and push the file to the repository
-    run_command(f"git add {save_path}")
-    run_command("git commit -m 'Add new file'")
-    run_command(f"git push --set-upstream origin {branch_name}")
-
-    print("Pushed file to new branch")
-    pr_url = "default"
-    #Create a pull request
-    #pr_url = create_pull_request(repo_name, base_branch, branch_name, contributer_name)
-
-    # Return to the original directory
-    os.chdir("..")
-    return pr_url, branch_name
-
-
 
 def run_command(command, error_message="Command failed", working_dir=None):
     try:
@@ -90,58 +44,6 @@ def run_command(command, error_message="Command failed", working_dir=None):
         print(error_message)
         sys.exit(1)
 
-def create_pull_request(repo_name, base_branch, branch_name, contributer_name):
-    """Create a pull request using GitHub CLI."""
-    result = subprocess.run(
-        [
-            "gh", "pr", "create",
-            "--title", f"{contributer_name}'s addition of a new simulation to the branch: {base_branch}",
-            "--body", "This PR adds a new file to the repository.",
-            "--base", base_branch,
-            "--head", branch_name,
-            "-R", repo_name
-        ],
-        check=True,
-        capture_output=True,
-        text=True
-    )
-     # Extract and return the PR URL
-    pr_url = result.stdout.strip()
-    print(f"Pull request created: {pr_url}")
-    return pr_url
-
-def branch_out():
-    """Create a new branch in the repository, and changes to the new branch."""
-    branch_name = "bot/info_yaml_" + time.strftime("%Y%m%d%H%M%S")
-    subprocess.run(["git", "checkout", "-b", branch_name])
-    subprocess.run(["git", "push", "--set-upstream", "origin", branch_name], check=True)
-    return branch_name
-    
-
-def authenticate_gh():
-    # Get the GitHub token from the environment
-    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-    try:
-        # Check if already authenticated
-        status_result = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
-
-        if status_result.returncode == 0:
-            print("GitHub CLI is already authenticated.")
-            return  # No need to re-authenticate
-        else:
-            print("GitHub CLI is not authenticated. Proceeding with login.")
-        
-        if not GITHUB_TOKEN:
-            print("GITHUB_TOKEN environment variable not set.")
-            return  # Exit the function if the token is not set
-
-        # Authenticate with GitHub CLI using the provided token
-        subprocess.run(["gh", "auth", "login", "--with-token"], input=GITHUB_TOKEN.encode(), check=True)
-        print("GitHub authentication successful.")
-        
-    except subprocess.CalledProcessError as e:
-        print(f"Error during GitHub authentication: {e}")
 
 
 def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
@@ -161,34 +63,8 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 
 
-def trigger_addData_workflow(repo_name, working_branch_name, target_branch_name, workflow_branch="dev_info_process"):
-    print("Starting to trigger the workflow...")  
 
-    """Triggers the AddData GitHub workflow using the GitHub CLI."""
-    workflow_filename = "AddData.yml"  # Fixed workflow filename
-
-    try:
-        result = subprocess.run(
-            [
-                "gh", "workflow", "run", workflow_filename,
-                "--repo", repo_name,
-                "--ref", workflow_branch,  # Specify the branch containing the workflow file
-                "--field", f"working_branch_name={working_branch_name}",
-                "--field", f"target_branch_name={target_branch_name}"
-            ],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        workflow_trigger_output = result.stdout.strip()
-        print(f"Workflow triggered successfully: {workflow_trigger_output}")
-        return workflow_trigger_output
-    except subprocess.CalledProcessError as e:
-        print(f"Error triggering workflow: {e.stderr}")
-        return None
-
-
-def branch_out_py(base_branch: str) -> str:
+def branch_out(base_branch: str) -> str:
     ts         = time.strftime("%Y%m%d%H%M%S", time.gmtime())
     new_branch = f"bot/info_yaml_{ts}"
 
@@ -203,7 +79,7 @@ def branch_out_py(base_branch: str) -> str:
 
 
 def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str, str]:
-    new_branch = branch_out_py(base_branch)
+    new_branch = branch_out(base_branch)
     yaml_text  = yaml.safe_dump(data, sort_keys=False, width=120)
     path       = f"UserData/{user_name}.yaml"
     message    = f"Add {user_name}.yaml"
@@ -217,3 +93,60 @@ def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str
 
     commit_html_url = created.content.html_url
     return commit_html_url, new_branch
+def create_pull_request(
+    gh,                      # Authenticated Github client with write permissions to the target repository
+    head_ref: str,           # Fully qualified head ref, e.g. "owner:branch"
+    title: str,
+    body: str = "",
+    base_branch: str = BASE_BRANCH,
+    target_owner: str = "", # Owner or org of the target repo
+    target_repo: str = ""   # Name of the target repository
+) -> str:
+    """
+    Create a pull request from head_ref into target_owner/target_repo:base_branch.
+    The provided `gh` client must be authenticated with a token that has push and pull request
+    creation privileges on the target repository.
+    Returns the URL of the new PR.
+    """
+    # Construct full repository name
+    target_fullname = f"{target_owner}/{target_repo}"
+
+    # Get the target repository object
+    repo_obj = gh.get_repo(target_fullname)
+
+    # Create the pull request
+    pr = repo_obj.create_pull(
+        title=title,
+        body=body,
+        head=head_ref,
+        base=base_branch
+    )
+
+    return pr.html_url
+
+def create_pull_request_to_target(
+    head_ref: str,
+    title: str,
+    body: str = "",
+    base_branch: str = BASE_BRANCH
+) -> str:
+    """
+    Shortcut to create a pull request against PULL_REQUEST_TARGET_REPO.
+    Splits the PULL_REQUEST_TARGET_REPO constant into owner and repo name,
+    then invokes create_pull_request with the `gh_target` client.
+    Returns the URL of the created PR.
+    """
+    # Extract owner and repo from the target repo constant
+    target_owner, target_repo = PULL_REQUEST_TARGET_REPO.split("/")
+
+    # Delegate to the generic helper
+    pr_url = create_pull_request(
+        gh=gh_target,
+        head_ref=head_ref,
+        title=title,
+        body=body,
+        base_branch=base_branch,
+        target_owner=target_owner,
+        target_repo=target_repo
+    )
+    return pr_url

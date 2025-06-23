@@ -14,56 +14,10 @@ const scalarFields = [
   'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR','TRAJECTORY_SIZE'
 ];
 const compositionList = [
-  'POPC',
-  'POPG',
-  'POPS',
-  'POPE',
-  'PYPC',
-  'PAzePCprot',
-  'PAzePCdeprot',
-  'DMPC',
-  'DPPC',
-  'DPPE',
-  'DPPG',
-  'DEPC',
-  'DRPC',
-  'DYPC',
-  'DLPC',
-  'DLIPC',
-  'DOG',
-  'DOPC',
-  'DOPE',
-  'DDOPC',
-  'DOPS',
-  'DSPC',
-  'DAPC',
-  'SLiPC',
-  'DMTAP',
-  'GM1',
-  'SOPC',
-  'POPI',
-  'SAPI',
-  'SAPI24',
-  'SLPI',
-  'SDG',
-  'SDPE',
-  'SM16',
-  'SM18',
-  'TOCL',
-  'TLCL',
-  'CER',
-  'CER180',
-  'CHOL',
-  'DCHOL',
-  'DHMDMAB',
-  'DPPGK',
-  'POT',
-  'SOD',
-  'CLA',
-  'CAL',
-  'CES',
-  'C20',
-  'SOL'
+  'POPC', 'POPG', 'POPS', 'POPE', 'PYPC', 'PAzePCprot', 'PAzePCdeprot', 'DMPC', 'DPPC', 'DPPE', 'DPPG', 
+  'DEPC', 'DRPC', 'DYPC', 'DLPC', 'DLIPC', 'DOG', 'DOPC', 'DOPE', 'DDOPC', 'DOPS', 'DSPC', 'DAPC', 'SLiPC', 
+  'DMTAP', 'GM1', 'SOPC', 'POPI', 'SAPI', 'SAPI24', 'SLPI', 'SDG', 'SDPE', 'SM16', 'SM18', 'TOCL', 'TLCL', 
+  'CER', 'CER180', 'CHOL', 'DCHOL', 'DHMDMAB', 'DPPGK', 'POT', 'SOD', 'CLA', 'CAL', 'CES', 'C20', 'SOL'
 ];
 
 
@@ -85,9 +39,9 @@ export default function App() {
   /* Form state */
   const [data, setData] = useImmer({
     DOI: '',
-    SOFTWARE: '',
     TRJ: '',
     TPR: '',
+    SOFTWARE: '',
     PREEQTIME: 0,
     TIMELEFTOUT: 0,
     DIR_WRK: '',
@@ -158,10 +112,9 @@ const handleChange = e => {
     setPullRequestUrl(null);
     setYamlPreview('');
     setData({
-      DOI: '', SOFTWARE: '', TRJ: '', TPR: '', PREEQTIME: 0, TIMELEFTOUT: 0,
-      DIR_WRK: '', PUBLICATION: '', AUTHORS_CONTACT: '', SYSTEM: '', SOFTWARE_VERSION: '',
-      FF: '', FF_SOURCE: '', FF_DATE: '', CPT: '', LOG: '', TOP: '',
-      COMPOSITION: [{ name: '', mapping: '' }]
+    DOI: '', SOFTWARE: '',TRJ: '',TPR: '',PREEQTIME: 0,TIMELEFTOUT: 0,DIR_WRK: '', UNITEDATOM_DICT: '', TYPEOFSYSTEM: '',
+    SYSTEM: '', PUBLICATION: '',AUTHORS_CONTACT: '', BATCHID: '', SOFTWARE_VERSION: '', FF: '', FF_SOURCE: '',
+    FF_DATE: '', CPT: '', LOG: '', TOP: '', EDR: '', COMPOSITION: {}
     });
   };
 
