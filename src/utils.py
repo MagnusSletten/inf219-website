@@ -129,26 +129,25 @@ def create_pull_request(
 def create_pull_request_to_target(
     head_ref: str,
     title: str,
-    body: str = "",
+    body: str = '',
     base_branch: str = WORK_BASE_BRANCH
 ) -> str:
-    """
-    Shortcut to create a pull request against PULL_REQUEST_TARGET_REPO.
-    Splits the PULL_REQUEST_TARGET_REPO constant into owner and repo name,
-    then invokes create_pull_request with the `gh_target` client.
-    Returns the URL of the created PR.
-    """
-    # Extract owner and repo from the target repo constant
-    target_owner, target_repo = PULL_REQUEST_TARGET_REPO.split("/")
+    # Parse owner/repo for target
+    target_owner, target_repo = PULL_REQUEST_TARGET_REPO.split('/')
+
+    # Parse the owner of your fork/work repo
+    source_owner = WORK_REPO_NAME.split('/')[0]
+
+    # Fully qualified head: "MagnusSletten:bot/info_yaml_…"
+    fq_head = f"{source_owner}:{head_ref}"
 
     # Delegate to the generic helper
-    pr_url = create_pull_request(
+    return create_pull_request(
         gh=gh_target,
-        head_ref=head_ref,
+        head_ref=fq_head,
         title=title,
         body=body,
         base_branch=base_branch,
         target_owner=target_owner,
         target_repo=target_repo
     )
-    return pr_url
