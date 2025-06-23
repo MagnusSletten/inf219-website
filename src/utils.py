@@ -10,20 +10,14 @@ import requests
 from github import Github
 from github import Auth
 
-REPO_NAME = 'MagnusSletten/BilayerData'
-PULL_REQUEST_TARGET_REPO = 'MagnusPriv/BilayerData'
-BASE_BRANCH = 'main'
-WORKFLOW_BRANCH = 'main'
-ClientID =  "Ov23liS8svKowq4uyPcG"
-ClientSecret = os.getenv("clientsecret")
-jwt_key = os.getenv("jwtkey")
-
+WORK_REPO_NAME = 'MagnusSletten/BilayerData' #Where data is originally uploaded
+WORK_BASE_BRANCH = 'main' # A branch will be created based on this branch
+PULL_REQUEST_TARGET_REPO = 'MagnusPriv/BilayerData' 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_TARGET_TOKEN = os.getenv("GITHUB_TARGET_TOKEN")
 
-gh   = Github(GITHUB_TOKEN)
-repo = gh.get_repo(f"{REPO_NAME}")
-
+gh_work   = Github(GITHUB_TOKEN)
+repo_work = gh_work.get_repo(f"{WORK_REPO_NAME}")
 gh_target= Github(GITHUB_TARGET_TOKEN)
 
 
@@ -69,22 +63,22 @@ def branch_out(base_branch: str) -> str:
     new_branch = f"bot/info_yaml_{ts}"
 
     # 1) Get the commit SHA of the base branch
-    source = repo.get_branch(base_branch)
+    source = gh_work.get_branch(base_branch)
     sha    = source.commit.sha
 
     # 2) Create the new branch ref
-    repo.create_git_ref(ref=f"refs/heads/{new_branch}", sha=sha)
+    gh_work.create_git_ref(ref=f"refs/heads/{new_branch}", sha=sha)
 
     return new_branch
 
 
-def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str, str]:
-    new_branch = branch_out(base_branch)
+def push_to_repo_yaml(data: dict, user_name: str) -> tuple[str, str]:
+    new_branch = branch_out(WORK_BASE_BRANCH)
     yaml_text  = yaml.safe_dump(data, sort_keys=False, width=120)
     path       = f"UserData/{user_name}.yaml"
     message    = f"Add {user_name}.yaml"
 
-    created = repo.create_file(
+    created = gh_work.create_file(
         path=path,
         message=message,
         content=yaml_text,
@@ -93,12 +87,13 @@ def push_to_repo_yaml(data: dict, user_name: str, base_branch: str) -> tuple[str
 
     commit_html_url = created.content.html_url
     return commit_html_url, new_branch
+
 def create_pull_request(
     gh,                      # Authenticated Github client with write permissions to the target repository
     head_ref: str,           # Fully qualified head ref, e.g. "owner:branch"
     title: str,
     body: str = "",
-    base_branch: str = BASE_BRANCH,
+    base_branch: str = WORK_BASE_BRANCH,
     target_owner: str = "", # Owner or org of the target repo
     target_repo: str = ""   # Name of the target repository
 ) -> str:
@@ -128,7 +123,7 @@ def create_pull_request_to_target(
     head_ref: str,
     title: str,
     body: str = "",
-    base_branch: str = BASE_BRANCH
+    base_branch: str = WORK_BASE_BRANCH
 ) -> str:
     """
     Shortcut to create a pull request against PULL_REQUEST_TARGET_REPO.

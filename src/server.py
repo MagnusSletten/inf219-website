@@ -129,14 +129,16 @@ def upload_file():
     if not user_name or not base_branch:
         return jsonify({'error': 'Missing userName or branch in JSON'}), 400
 
-
     # 4) Validate against your existing schema
     if not utils.is_input_valid(data):
         return jsonify({'error': 'Validation failed'}), 400
 
+    commit_url,commit_branch = utils.push_to_repo_yaml(data,user_name,"")
 
-
-    url = utils.create_pull_request_to_target()
+    url = utils.create_pull_request_to_target(
+        head_ref=commit_branch,
+        title= f"Automated addition of data from {user_name}",
+        body=f"Processing of data will happen after pull request is made")
 
     return jsonify(message="Uploaded!", pullUrl=url), 200
     
