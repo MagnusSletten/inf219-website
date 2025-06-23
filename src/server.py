@@ -133,7 +133,7 @@ def upload_file():
     if not utils.is_input_valid(data):
         return jsonify({'error': 'Validation failed'}), 400
 
-    commit_url,commit_branch = utils.push_to_repo_yaml(data,user_name,"")
+    commit_url,commit_branch = utils.push_to_repo_yaml(data,user_name)
 
     url = utils.create_pull_request_to_target(
         head_ref=commit_branch,
