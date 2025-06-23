@@ -68,11 +68,11 @@ def branch_out(base_branch: str) -> str:
     new_branch = f"bot/info_yaml_{ts}"
 
     # 1) Get the commit SHA of the base branch
-    source = gh_work.get_branch(base_branch)
+    source = repo_work.get_branch(base_branch)
     sha    = source.commit.sha
 
     # 2) Create the new branch ref
-    gh_work.create_git_ref(ref=f"refs/heads/{new_branch}", sha=sha)
+    repo_work.create_git_ref(ref=f"refs/heads/{new_branch}", sha=sha)
 
     return new_branch
 
@@ -83,7 +83,7 @@ def push_to_repo_yaml(data: dict, user_name: str) -> tuple[str, str]:
     path       = f"UserData/{user_name}.yaml"
     message    = f"Add {user_name}.yaml"
 
-    created = gh_work.create_file(
+    created = repo_work.create_file(
         path=path,
         message=message,
         content=yaml_text,
