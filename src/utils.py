@@ -57,7 +57,7 @@ def git_setup(name="NMRlipids_File_Upload", email="nmrlipids_bot@github.com"):
 
 def git_pull():
     try:
-        subprocess.run(["git", "pull"] check=True)
+        subprocess.run(["git", "pull"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while updating Git: {e}")
 
