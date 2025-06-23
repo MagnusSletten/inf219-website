@@ -83,14 +83,16 @@ def push_to_repo_yaml(data: dict, user_name: str) -> tuple[str, str]:
     path       = f"UserData/{user_name}.yaml"
     message    = f"Add {user_name}.yaml"
 
-    created = repo_work.create_file(
+    response = repo_work.create_file(
         path=path,
         message=message,
         content=yaml_text,
         branch=new_branch
     )
 
-    commit_html_url = created.content.html_url
+    # Extract the ContentFile object and its HTML URL
+    content_file = response['content']
+    commit_html_url = content_file.html_url
     return commit_html_url, new_branch
 
 def create_pull_request(
