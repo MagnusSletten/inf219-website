@@ -36,34 +36,30 @@ export default function App() {
   /* YAML Preview */
   const [yamlPreview, setYamlPreview] = useState('');
 
-  /* Form state */
-  const [data, setData] = useImmer({
-    DOI: '',
-    TRJ: '',
-    TPR: '',
-    SOFTWARE: '',
-    PREEQTIME: 0,
-    TIMELEFTOUT: 0,
-    DIR_WRK: '',
-    UNITEDATOM_DICT: '',
-    TYPEOFSYSTEM: '',
-    SYSTEM: '',
-    PUBLICATION: '',
-    AUTHORS_CONTACT: '',
-    BATCHID: '',
-    SOFTWARE_VERSION: '',
-    FF: '',
-    FF_SOURCE: '',
-    FF_DATE: '',
-    CPT: '',
-    LOG: '',
-    TOP: '',
-    EDR: '',
-    COMPOSITION: {}
-    // key: nmrlipids-name   value: { name: string, mapping_file: string }
-    // this starts empty
-    
-  });
+const [data, setData] = useImmer({
+  DOI: null,
+  TRJ: null,
+  TPR: null,
+  SOFTWARE: null,
+  PREEQTIME: null,
+  TIMELEFTOUT: null,
+  DIR_WRK: null,
+  UNITEDATOM_DICT: null,
+  TYPEOFSYSTEM: null,
+  SYSTEM: null,
+  PUBLICATION: null,
+  AUTHORS_CONTACT: null,
+  BATCHID: null,
+  SOFTWARE_VERSION: null,
+  FF: null,
+  FF_SOURCE: null,
+  FF_DATE: null,
+  CPT: null,
+  LOG: null,
+  TOP: null,
+  EDR: null,
+  COMPOSITION: {}
+});
   const clone = obj => JSON.parse(JSON.stringify(obj));
 /* scalar values */
   
