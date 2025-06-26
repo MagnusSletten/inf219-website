@@ -21,6 +21,7 @@ ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+authentication_repository="MagnusSletten/Databank"
 
 
 @app.route('/app/awake', methods=['GET','OPTIONS'])
@@ -63,7 +64,7 @@ def verifyCode():
     # Check their push/admin access on the repo
     admin_status = user_has_push_access(
         access_token,
-        "MagnusSletten/Databank"
+        authentication_repository
     )
 
     return jsonify({
@@ -80,7 +81,7 @@ def updateCompositionList():
         return jsonify(error="Missing token"), 401
     user_token = auth.split()[1]
 
-    if not user_has_push_access(user_token, "NMRLipids/Databank"):
+    if not user_has_push_access(user_token, authentication_repository):
         return jsonify(error="Insufficient privileges"), 403
 
     # now safe to refresh…
