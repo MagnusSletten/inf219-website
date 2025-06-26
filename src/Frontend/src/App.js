@@ -19,7 +19,8 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
+  const [adminStatus, setAdminStatus] = useState(false);
   const [loggedInMessage, setLoggedInMessage] = useState('');
   const [userName, setUserName] = useState('');
   const [branch, setBranch] = useState('main');
@@ -39,22 +40,22 @@ export default function App() {
       .catch(err => console.error("Failed to load molecules:", err));
   }, []);
 
-const handleRefresh = async () => {
+const updateComposition = async () => {
   try {
     await axios.post(
       `${IP}refresh-composition`,
       {},
       { headers: { Authorization: `Bearer ${localStorage.githubToken}` } }
     );
-    setRefreshMessage('✅ List refreshed');
+    setRefreshMessage('Composition list updated successfully');
     // re-fetch updated list
     const resp = await axios.get(`${IP}molecules`);
     setCompositionList(resp.data);
   } catch (err) {
     if (err.response?.status === 403) {
-      setRefreshMessage('❌ Not authorized');
+      setRefreshMessage('Not authorized');
     } else {
-      setRefreshMessage('❌ Refresh failed');
+      setRefreshMessage('Refresh failed');
     }
   }
   };
@@ -92,29 +93,31 @@ const handleChange = e => {
 };
 
 
-  /* GitHub OAuth */
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    if (localStorage.githubToken) {
-      setLoggedIn(true);
-      setLoggedInMessage(`Logged in as ${localStorage.username}`);
-      return;
-    }
-    if (code) {
-      axios.post(`${IP}verifyCode`, { code })
-        .then(res => {
-          if (res.data.authenticated) {
-            localStorage.githubToken = res.data.token;
-            localStorage.username = res.data.username || '';
-            setLoggedIn(true);
-            setLoggedInMessage(`Logged in as ${res.data.username || ''}`);
-            window.history.replaceState(null, '', window.location.pathname);
-          }
-        })
-        .catch(() => setMessage('GitHub login failed'));
-    }
-  }, []);
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (localStorage.githubToken) {
+    setLoggedIn(true);
+    setLoggedInMessage(`Logged in as ${localStorage.username}`);
+    return;
+  }
+  if (code) {
+    axios.post(`${IP}verifyCode`, { code })
+      .then(res => {
+        if (res.data.authenticated) {
+          const { token, username, admin_status } = res.data;
+          localStorage.githubToken = token;
+          localStorage.username   = username;
+          setLoggedIn(true);
+          setLoggedInMessage(`Logged in as ${username}`);
+          setAdminStatus(admin_status);     
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      })
+      .catch(() => setMessage('GitHub login failed'));
+  }
+}, []);
 
   const githubLogin = () => {
     window.location.assign(`https://github.com/login/oauth/authorize/?client_id=${ClientID}`);
@@ -161,10 +164,10 @@ const handleSubmit = async e => {
   } catch (err) {
     // If the server returned JSON, this will log it
     if (err.response) {
-      console.error('❌ Server responded with:', err.response.status, err.response.data);
+      console.error('Server responded with:', err.response.status, err.response.data);
       setMessage(`Upload failed: ${err.response.data.error}`);
     } else {
-      console.error('❌ Network or other error', err);
+      console.error('Network or other error', err);
       setMessage(`Upload failed: ${err.message}`);
     }
   }
@@ -174,15 +177,17 @@ const handleSubmit = async e => {
 
   return (
     <div className="Container">
-      <div className="Left" />
-      {loggedIn && (
-        <div className="refresh-panel">
-          <button onClick={handleRefresh} className="button centered">
-            Update lipid list
-          </button>
-          {refreshMessage && <p className="centered">{refreshMessage}</p>}
+      <div className="Left">
+        <div className="Admin-panel">
+          {loggedIn && adminStatus && (
+            <div className="refresh-panel">
+              <button onClick={updateComposition} className="button centered">
+                Update lipid list
+              </button>
+              {refreshMessage && <p className="centered">{refreshMessage}</p>}
+            </div>)}
         </div>
-      )}
+      </div>
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />

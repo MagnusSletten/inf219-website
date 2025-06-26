@@ -27,7 +27,7 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 def awake():
     return "<h1> Server is awake!<h1>", 200
 
-@app.route('/app/verifyCode',methods=['POST', 'OPTIONS'])
+@app.route('/app/verifyCode', methods=['POST', 'OPTIONS'])
 def verifyCode():
 
     if request.method == 'OPTIONS':
@@ -45,10 +45,7 @@ def verifyCode():
         "code": code
     }
 
-    headers = {
-        "Accept": "application/json"
-    }
-
+    headers = {"Accept": "application/json"}
     response = requests.post(url, data=payload, headers=headers)
     data = response.json()
     access_token = data.get("access_token")
@@ -61,12 +58,20 @@ def verifyCode():
         "https://api.github.com/user",
         headers={"Authorization": f"Bearer {access_token}"}
     ).json()
-
     username = user_info.get("login")
-    print(username)
 
-   
-    return jsonify({"authenticated": True, "token": access_token, "username":username})
+    # Check their push/admin access on the repo
+    admin_status = user_has_push_access(
+        access_token,
+        "NMRlipids/Databank"
+    )
+
+    return jsonify({
+        "authenticated": True,
+        "token": access_token,
+        "username": username,
+        "admin_status": admin_status
+    })
 
 @app.route('/app/api/refresh-composition', methods=['POST'])
 def updateCompositionList():
@@ -89,18 +94,7 @@ def list_molecules_root():
     return jsonify(get_composition_names()), 200
 
 
-def verifyJwt(): 
-    auth_header = request.headers.get('authorization')
-    if(auth_header):
-        try:
-            token = auth_header.split(' ')[1]
-            decoded_token = jwt.decode(token,jwt_key,algorithms=["HS256"])
-            return decoded_token, None,None       
-        except jwt.ExpiredSignatureError:
-            return None,jsonify({"error":"Expired Signature"},),401
-        except jwt.InvalidTokenError:
-            return None,jsonify({"error": "Invalid token"}), 401
-    return None,jsonify({"error": "Authorization header missing"}), 400
+
 
 
 def authorizeToken(access_token):
