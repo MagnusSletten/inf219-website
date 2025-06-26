@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import utils
@@ -89,7 +89,7 @@ def updateCompositionList():
     return jsonify({"success": True, "count": len(all_ids)}), 200
 
 
-@app.route('/molecules.json')
+@app.route('/app/molecules.json')
 def serve_molecules():
     return send_from_directory(app.static_folder, 'molecules.json')
 
