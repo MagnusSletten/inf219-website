@@ -16,6 +16,11 @@ html, body {
   flex-direction: column;
   
 }
+
+.Left {
+  display: flex;             /* become a flex container */
+  flex-direction: column;    /* stack children vertically */
+}
 .App {
   display: flex;
   flex-direction: column;

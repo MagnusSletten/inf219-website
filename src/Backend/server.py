@@ -68,7 +68,7 @@ def verifyCode():
    
     return jsonify({"authenticated": True, "token": access_token, "username":username})
 
-@app.route('/api/refresh-composition', methods=['POST'])
+@app.route('/app/api/refresh-composition', methods=['POST'])
 def updateCompositionList():
     auth = request.headers.get('Authorization','')
     if not auth.startswith('Bearer '):
