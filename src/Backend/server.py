@@ -89,7 +89,7 @@ def updateCompositionList():
     return jsonify({"success": True, "count": len(all_ids)}), 200
 
 
-@app.route('/app/molecules.json')
+@app.route('/app/molecules')
 def serve_molecules():
     return send_from_directory(app.static_folder, 'molecules.json')
 
