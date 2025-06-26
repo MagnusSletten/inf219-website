@@ -11,7 +11,7 @@ import { useImmer } from 'use-immer';
 const scalarFields = [
   'DOI','SOFTWARE','TRJ','TPR','PREEQTIME','TIMELEFTOUT','DIR_WRK',
   'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','AUTHORS_CONTACT',
-  'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR','TRAJECTORY_SIZE'
+  'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR',
 ];
 const compositionList = [
   'POPC', 'POPG', 'POPS', 'POPE', 'PYPC', 'PAzePCprot', 'PAzePCdeprot', 'DMPC', 'DPPC', 'DPPE', 'DPPG', 
@@ -225,10 +225,10 @@ const handleSubmit = async e => {
       {/* 2) name input */}
       <input
         placeholder="Name"
-        value={info.name || ''}
+        value={info.NAME || ''}
         onChange={e =>
           setData(draft => {
-            draft.COMPOSITION[lipidId].name = e.target.value;
+            draft.COMPOSITION[lipidId].NAME = e.target.value;
           })
         }
       />
@@ -236,10 +236,10 @@ const handleSubmit = async e => {
       {/* 3) mapping input */}
       <input
         placeholder="Mapping"
-        value={info.mapping || ''}
+        value={info.MAPPING || ''}
         onChange={e =>
           setData(draft => {
-            draft.COMPOSITION[lipidId].mapping = e.target.value;
+            draft.COMPOSITION[lipidId].MAPPING = e.target.value;
           })
         }
       />
@@ -263,7 +263,7 @@ const handleSubmit = async e => {
     type="button"
     onClick={() =>
       setData(draft => {
-        draft.COMPOSITION[''] = { name: '', mapping: '' };
+        draft.COMPOSITION[''] = { NAME: '', MAPPING: '' };
       })
     }
   >
