@@ -18,8 +18,17 @@ html, body {
 }
 
 .Left {
-  display: flex;             /* become a flex container */
-  flex-direction: column;    /* stack children vertically */
+  display: flex;
+  flex-direction: column;     /* stack vertically if you add more later */
+  align-items: center;        /* center horizontally */
+  justify-content: flex-start;/* push to top */
+  padding: 1rem;              /* optional spacing */
+  /* width stays at 15% per your grid */
+}
+
+.refresh-button {
+  width: auto;                /* shrink to fit its text */
+  margin: 0;                  /* remove extra margins */
 }
 .App {
   display: flex;

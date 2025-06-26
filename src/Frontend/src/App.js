@@ -42,7 +42,7 @@ export default function App() {
 const handleRefresh = async () => {
   try {
     await axios.post(
-      '/api/refresh-composition',
+      `${IP}refresh-composition`,
       {},
       { headers: { Authorization: `Bearer ${localStorage.githubToken}` } }
     );
