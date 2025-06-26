@@ -89,7 +89,7 @@ def updateCompositionList():
     return jsonify({"success": True, "count": len(all_ids)}), 200
 
 
-@app.route('/molecules', methods=['GET'])
+@app.route('/app/molecules', methods=['GET'])
 def list_molecules_root():
     return jsonify(get_composition_names()), 200
 
