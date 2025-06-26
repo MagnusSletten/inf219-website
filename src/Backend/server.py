@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import utils
-from utils import lipid_token_authentication,get_composition_names,refresh_composition_file
+from utils import lipid_token_authentication,get_composition_names,refresh_composition_file,user_has_push_access
 import json
 import requests 
 import jwt
@@ -20,6 +20,7 @@ CORS(app)
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 @app.route('/app/awake', methods=['GET','OPTIONS'])
@@ -69,24 +70,18 @@ def verifyCode():
 
 @app.route('/api/refresh-composition', methods=['POST'])
 def updateCompositionList():
-    auth = request.headers.get('Authorization', '')
+    auth = request.headers.get('Authorization','')
     if not auth.startswith('Bearer '):
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
-    token = auth.split(None, 1)[1]
+        return jsonify(error="Missing token"), 401
+    user_token = auth.split()[1]
 
-    if not lipid_token_authentication(token):
-        return jsonify({"error": "Token does not have push access"}), 403
+    if not user_has_push_access(user_token, "NMRLipids/Databank"):
+        return jsonify(error="Insufficient privileges"), 403
 
-    all_ids = get_composition_names()
-    out_path = os.path.join(app.static_folder, 'molecules.json')
+    # now safe to refresh…
+    count = refresh_composition_file(os.path.join(os.path.dirname(__file__), 'static'))
+    return jsonify(success=True, count=count), 200
 
-    # Write atomically
-    tmp_path = out_path + '.tmp'
-    with open(tmp_path, 'w') as f:
-        f.write(json.dumps(all_ids, indent=2))
-    os.replace(tmp_path, out_path)
-
-    return jsonify({"success": True, "count": len(all_ids)}), 200
 
 
 @app.route('molecules', methods=['GET'])

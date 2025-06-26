@@ -182,3 +182,25 @@ def refresh_composition_file(static_folder: str) -> int:
     os.replace(tmp, out_path)
 
     return len(all_ids)
+
+def user_has_push_access(user_token: str, repo_full_name: str) -> bool:
+    """
+    Given a user’s OAuth token, verify they have write/admin rights
+    on `repo_full_name` by checking collaborator permissions.
+    """
+    # 1) get the username from their token
+    try:
+        gh_user = Github(user_token)
+        username = gh_user.get_user().login
+    except Exception:
+        return False
+
+    # 2) ask GitHub (with our server token) about their permission
+    try:
+        gh_srv = Github(GITHUB_TOKEN)
+        repo    = gh_srv.get_repo(repo_full_name)
+        perm    = repo.get_collaborator_permission(username)  # "read","write","admin","none"
+    except Exception:
+        return False
+
+    return perm in ("write", "admin")

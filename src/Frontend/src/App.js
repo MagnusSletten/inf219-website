@@ -25,6 +25,7 @@ export default function App() {
   const [branch, setBranch] = useState('main');
   const [message, setMessage] = useState('Fill in the form');
   const [pullRequestUrl, setPullRequestUrl] = useState(null);
+  const [refreshMessage, setRefreshMessage] = useState('');
 
   /* YAML Preview */
   const [yamlPreview, setYamlPreview] = useState('');
@@ -37,6 +38,27 @@ export default function App() {
       .then(res => setCompositionList(res.data))
       .catch(err => console.error("Failed to load molecules:", err));
   }, []);
+
+const handleRefresh = async () => {
+  try {
+    await axios.post(
+      '/api/refresh-composition',
+      {},
+      { headers: { Authorization: `Bearer ${localStorage.githubToken}` } }
+    );
+    setRefreshMessage('✅ List refreshed');
+    // re-fetch updated list
+    const resp = await axios.get(`${IP}molecules`);
+    setCompositionList(resp.data);
+  } catch (err) {
+    if (err.response?.status === 403) {
+      setRefreshMessage('❌ Not authorized');
+    } else {
+      setRefreshMessage('❌ Refresh failed');
+    }
+  }
+  };
+
 
 const [data, setData] = useImmer({
   DOI: null,
@@ -153,6 +175,14 @@ const handleSubmit = async e => {
   return (
     <div className="Container">
       <div className="Left" />
+      {loggedIn && (
+        <div className="refresh-panel">
+          <button onClick={handleRefresh} className="button centered">
+            Update lipid list
+          </button>
+          {refreshMessage && <p className="centered">{refreshMessage}</p>}
+        </div>
+      )}
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
