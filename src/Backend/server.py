@@ -84,7 +84,7 @@ def updateCompositionList():
 
 
 
-@app.route('molecules', methods=['GET'])
+@app.route('/molecules', methods=['GET'])
 def list_molecules_root():
     return jsonify(get_composition_names()), 200
 
