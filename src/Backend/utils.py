@@ -98,36 +98,6 @@ def push_to_repo_yaml(data: dict, user_name: str) -> tuple[str, str]:
     commit_html_url = content_file.html_url
     return commit_html_url, new_branch
 
-def create_pull_request(
-    gh,                      # Authenticated Github client with write permissions to the target repository
-    head_ref: str,           # Fully qualified head ref, e.g. "owner:branch"
-    title: str,
-    body: str = "",
-    base_branch: str = WORK_BASE_BRANCH,
-    target_owner: str = "", # Owner or org of the target repo
-    target_repo: str = ""   # Name of the target repository
-) -> str:
-    """
-    Create a pull request from head_ref into target_owner/target_repo:base_branch.
-    The provided `gh` client must be authenticated with a token that has push and pull request
-    creation privileges on the target repository.
-    Returns the URL of the new PR.
-    """
-    # Construct full repository name
-    target_fullname = f"{target_owner}/{target_repo}"
-
-    # Get the target repository object
-    repo_obj = gh.get_repo(target_fullname)
-
-    # Create the pull request
-    pr = repo_obj.create_pull(
-        title=title,
-        body=body,
-        head=head_ref,
-        base=base_branch
-    )
-
-    return pr.html_url
 
 def create_pull_request_to_target(
     head_ref: str,
@@ -162,12 +132,6 @@ def get_composition_names():
     return all_molecules
 
 
-def lipid_token_authentication(token: str) -> bool:
-    g = Github(token)
-    repo = g.get_repo("NMRlipids/Databank")
-    # `repo.permissions` is a dict like {"admin": False, "push": True, "pull": True}
-    perms = repo.permissions
-    return perms.get("push", False)
 
 def refresh_composition_file(static_folder: str) -> int:
     """

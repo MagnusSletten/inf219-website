@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import utils
-from utils import lipid_token_authentication,get_composition_names,refresh_composition_file,user_has_push_access
+from utils import get_composition_names,refresh_composition_file,user_has_push_access
 import json
 import requests 
 import jwt
@@ -74,7 +74,7 @@ def verifyCode():
         "admin_status": admin_status
     })
 
-@app.route('/app/api/refresh-composition', methods=['POST'])
+@app.route('/app/refresh-composition', methods=['POST'])
 def updateCompositionList():
     auth = request.headers.get('Authorization','')
     if not auth.startswith('Bearer '):
@@ -141,7 +141,6 @@ def upload_file():
     if not user_name or not base_branch:
         return jsonify({'error': 'Missing userName or branch in JSON'}), 400
 
-    # 4) Validate against your existing schema
     if not utils.is_input_valid(data):
         return jsonify({'error': 'Validation failed'}), 400
 
