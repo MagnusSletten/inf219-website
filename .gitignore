@@ -11,6 +11,9 @@
 # production
 /build
 
+/src/Backend/static/molecules.json
+node_modules/
+*__pycache__/
 # misc
 .DS_Store
 .env.local

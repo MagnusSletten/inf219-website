@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import YAML from 'yaml';
 import axios from 'axios';
 import './App.css';
 import logo from './logo.svg';
@@ -12,12 +11,6 @@ const scalarFields = [
   'DOI','SOFTWARE','TRJ','TPR','PREEQTIME','TIMELEFTOUT','DIR_WRK',
   'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','AUTHORS_CONTACT',
   'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','EDR',
-];
-const compositionList = [
-  'POPC', 'POPG', 'POPS', 'POPE', 'PYPC', 'PAzePCprot', 'PAzePCdeprot', 'DMPC', 'DPPC', 'DPPE', 'DPPG', 
-  'DEPC', 'DRPC', 'DYPC', 'DLPC', 'DLIPC', 'DOG', 'DOPC', 'DOPE', 'DDOPC', 'DOPS', 'DSPC', 'DAPC', 'SLiPC', 
-  'DMTAP', 'GM1', 'SOPC', 'POPI', 'SAPI', 'SAPI24', 'SLPI', 'SDG', 'SDPE', 'SM16', 'SM18', 'TOCL', 'TLCL', 
-  'CER', 'CER180', 'CHOL', 'DCHOL', 'DHMDMAB', 'DPPGK', 'POT', 'SOD', 'CLA', 'CAL', 'CES', 'C20', 'SOL'
 ];
 
 
@@ -35,6 +28,15 @@ export default function App() {
 
   /* YAML Preview */
   const [yamlPreview, setYamlPreview] = useState('');
+
+  const [compositionList, setCompositionList] = useState([]);
+
+  // Fetch the up‐to‐date molecule list on mount
+  useEffect(() => {
+    axios.get(`${IP}molecules`)
+      .then(res => setCompositionList(res.data))
+      .catch(err => console.error("Failed to load molecules:", err));
+  }, []);
 
 const [data, setData] = useImmer({
   DOI: null,
@@ -60,9 +62,7 @@ const [data, setData] = useImmer({
   EDR: null,
   COMPOSITION: {}
 });
-  const clone = obj => JSON.parse(JSON.stringify(obj));
-/* scalar values */
-  
+
 // 1) change any scalar
 const handleChange = e => {
   const { name, value } = e.target;

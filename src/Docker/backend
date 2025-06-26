@@ -38,17 +38,18 @@ RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-w
  && chown -R runner:runner /app
 
 # Clone the databank repo
-ENV NMLDB_DATA_PATH=/Databank/Scripts/tests/Data \
-    NMLDB_SIMU_PATH=/Databank/Scripts/tests/Data/Simulations.1
-# Clone the databank repo
 WORKDIR /Databank
-RUN git clone --branch ${Databank_branch} ${Databank_URL} . && \
-    pip install --break-system-packages -e .
+
+RUN git clone \
+      --branch ${Databank_branch} \
+      --recurse-submodules \
+      ${Databank_URL} . \
+    && pip install --break-system-packages -e .
 
 # Expose Flask port
 EXPOSE 5001
 
 # Set working directory back to site and launch app
 WORKDIR /app/inf219-website
-CMD ["python3", "src/server.py"]
+CMD ["python3", "Backend/src/server.py"]
 

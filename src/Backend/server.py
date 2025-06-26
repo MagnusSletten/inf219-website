@@ -3,9 +3,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import utils
-import tempfile
-import time 
-import yaml 
+from utils import lipid_token_authentication,get_composition_names,refresh_composition_file
+import json
 import requests 
 import jwt
 from requests.auth import HTTPBasicAuth
@@ -21,9 +20,6 @@ CORS(app)
 ClientID =  "Ov23liS8svKowq4uyPcG"
 ClientSecret = os.getenv("clientsecret")
 jwt_key = os.getenv("jwtkey")
-
-
-
 
 
 @app.route('/app/awake', methods=['GET','OPTIONS'])
@@ -70,6 +66,32 @@ def verifyCode():
 
    
     return jsonify({"authenticated": True, "token": access_token, "username":username})
+
+@app.route('/api/refresh-composition', methods=['POST'])
+def updateCompositionList():
+    auth = request.headers.get('Authorization', '')
+    if not auth.startswith('Bearer '):
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    token = auth.split(None, 1)[1]
+
+    if not lipid_token_authentication(token):
+        return jsonify({"error": "Token does not have push access"}), 403
+
+    all_ids = get_composition_names()
+    out_path = os.path.join(app.static_folder, 'molecules.json')
+
+    # Write atomically
+    tmp_path = out_path + '.tmp'
+    with open(tmp_path, 'w') as f:
+        f.write(json.dumps(all_ids, indent=2))
+    os.replace(tmp_path, out_path)
+
+    return jsonify({"success": True, "count": len(all_ids)}), 200
+
+
+@app.route('/molecules.json')
+def serve_molecules():
+    return send_from_directory(app.static_folder, 'molecules.json')
 
 
 def verifyJwt(): 
@@ -141,13 +163,15 @@ def upload_file():
         body=f"Processing of data will happen after pull request is made")
 
     return jsonify(message="Uploaded!", pullUrl=url), 200
-    
-
+ 
 
 if __name__ == '__main__':
     if not ClientSecret:
         raise ValueError("Missing client secret in environment!")
     utils.git_setup()
     utils.git_pull()
+    # point at the real static folder
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    refresh_composition_file(static_dir)
     app.run(host="0.0.0.0", port=5001, debug=False)
 

@@ -1,14 +1,15 @@
 # app.py
 import subprocess
-import os
-import yaml
-import time
+import os, yaml, time, json
 from werkzeug.datastructures import FileStorage
 from DatabankLib.databankLibrary import parse_valid_config_settings, YamlBadConfigException
+from DatabankLib.settings.molecules import lipids_set,molecules_set
+
 import sys 
 import requests 
 from github import Github
 from github import Auth
+
 
 WORK_REPO_NAME = 'MagnusSletten/BilayerData' #Where data is originally uploaded
 WORK_BASE_BRANCH = 'main' # A branch will be created based on this branch
@@ -19,6 +20,7 @@ GITHUB_TARGET_TOKEN = os.getenv("GITHUB_TARGET_TOKEN")
 gh_work   = Github(GITHUB_TOKEN)
 repo_work = gh_work.get_repo(f"{WORK_REPO_NAME}")
 gh_target= Github(GITHUB_TARGET_TOKEN)
+
 
 
 def is_input_valid(info_yaml_dict:dict ):
@@ -151,3 +153,32 @@ def create_pull_request_to_target(
         target_owner=target_owner,
         target_repo=target_repo
     )
+
+def get_composition_names():
+    # Combine the two sets of names
+    all_molecules = sorted(lipids_set.names.union(molecules_set.names))
+
+    return all_molecules
+
+
+def lipid_token_authentication(token: str) -> bool:
+    g = Github(token)
+    repo = g.get_repo("NMRlipids/Databank")
+    # `repo.permissions` is a dict like {"admin": False, "push": True, "pull": True}
+    perms = repo.permissions
+    return perms.get("push", False)
+
+def refresh_composition_file(static_folder: str) -> int:
+    """
+    Regenerate and atomically write out molecules.json into the given static folder.
+    Returns the number of entries written.
+    """
+    all_ids = sorted(lipids_set.names.union(molecules_set.names))
+    out_path = os.path.join(static_folder, 'molecules.json')
+    tmp = out_path + '.tmp'
+
+    with open(tmp, 'w') as f:
+        json.dump(all_ids, f, indent=2)
+    os.replace(tmp, out_path)
+
+    return len(all_ids)
