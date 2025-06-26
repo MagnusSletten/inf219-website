@@ -63,7 +63,7 @@ def verifyCode():
     # Check their push/admin access on the repo
     admin_status = user_has_push_access(
         access_token,
-        "NMRlipids/Databank"
+        "MagnusSletten/Databank"
     )
 
     return jsonify({
