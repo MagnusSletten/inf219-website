@@ -16,6 +16,7 @@ WORK_BASE_BRANCH = 'main' # A branch will be created based on this branch
 PULL_REQUEST_TARGET_REPO = 'MagnusPriv/BilayerData' 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_TARGET_TOKEN = os.getenv("GITHUB_TARGET_TOKEN")
+GITHUB_SERVER_AUTH_TOKEN = os.getenv("GITHUB_SERVER_AUTH_TOKEN")
 
 gh_work   = Github(GITHUB_TOKEN)
 repo_work = gh_work.get_repo(f"{WORK_REPO_NAME}")
@@ -197,7 +198,7 @@ def user_has_push_access(user_token: str, repo_full_name: str) -> bool:
 
     # 2) ask GitHub (with our server token) about their permission
     try:
-        gh_srv = Github(GITHUB_TOKEN)
+        gh_srv = Github(GITHUB_SERVER_AUTH_TOKEN)
         repo    = gh_srv.get_repo(repo_full_name)
         perm    = repo.get_collaborator_permission(username)  # "read","write","admin","none"
     except Exception:
