@@ -13,7 +13,7 @@
 
 /src/Backend/static/molecules.json
 node_modules/
-*__pycache__/
+*__pycache__/molecules.json
 # misc
 .DS_Store
 .env.local
