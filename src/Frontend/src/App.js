@@ -21,7 +21,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [adminStatus, setAdminStatus] = useState(
   localStorage.getItem('adminStatus') === 'true'
 );
@@ -180,7 +180,7 @@ return (
         <div className="Admin-panel">
           <h3> Administration panel </h3>
           <div className="refresh-panel">
-            <button onClick={updateComposition} className="button centered">
+            <button onClick={updateComposition} className="button secondary">
               Update lipid list
             </button>
             {refreshMessage && <p className="centered">{refreshMessage}</p>}
@@ -255,7 +255,7 @@ return (
 
     <div className="Right">
       {loggedIn && (
-        <button onClick={handleLogout} className="button">Logout</button>
+        <button onClick={handleLogout} className="button secondary">Logout</button>
       )}
       <Description />
     </div>
