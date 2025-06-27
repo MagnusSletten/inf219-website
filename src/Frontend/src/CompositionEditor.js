@@ -28,7 +28,7 @@ export default function CompositionEditor({ composition, setComposition, options
             placeholder="Name"
             value={info.NAME || ''}
             onChange={e =>
-              setComposition(draft => { draft[lipidId].NAME = e.target.value; })
+              setComposition(draft => { draft[lipidId].NAME = e.target.value.trimEnd(); })
             }
           />
 
