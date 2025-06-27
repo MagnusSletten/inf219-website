@@ -95,9 +95,6 @@ def list_molecules_root():
     return jsonify(get_composition_names()), 200
 
 
-
-
-
 def authorizeToken(access_token):
     url = f"https://api.github.com/applications/{ClientID}/token"
     headers = {"Accept": "application/vnd.github+json"}
