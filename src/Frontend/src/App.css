@@ -8,7 +8,7 @@ html, body {
 .Container {
   display: grid;
   width: 100%;
-  grid-template-columns: 10% 80% 10%;
+  grid-template-columns: 15% 65% 15%;
   justify-content: center; 
   
 }
@@ -88,7 +88,8 @@ html, body {
   border: 1px solid #ccc;  
   border-radius: 4px;       
   font-size: 16px;          
-  outline: none;            
+  outline: none;
+  max-width: 300px;              
   transition: border-color 0.3s ease; 
 }
 
@@ -181,7 +182,7 @@ html, body {
   border: 2px solid darkblue;      
   border-radius: 4px;
   padding: 5px;
-             
+
 
 }
 

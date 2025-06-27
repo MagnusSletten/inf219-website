@@ -21,7 +21,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [adminStatus, setAdminStatus] = useState(
   localStorage.getItem('adminStatus') === 'true'
 );
@@ -176,75 +176,91 @@ const handleSubmit = async e => {
 return (
   <div className="Container">
     <div className="Left">
-        {loggedIn && localStorage.adminStatus && (
-          <div className="Admin-panel">
-              <div className="refresh-panel">
-                <button onClick={updateComposition} className="button centered">
-                  Update lipid list
-                </button>
-                {refreshMessage && <p className="centered">{refreshMessage}</p>}
-              </div>
-           </div>
-        )}
-     
+      {loggedIn && localStorage.adminStatus && (
+        <div className="Admin-panel">
+          <div className="refresh-panel">
+            <button onClick={updateComposition} className="button centered">
+              Update lipid list
+            </button>
+            {refreshMessage && <p className="centered">{refreshMessage}</p>}
+          </div>
+        </div>
+      )}
     </div>
 
     <div className="App">
       <header className="App-header">
         <h1>Welcome to NMRLipids Upload Portal</h1>
       </header>
-       { !loggedIn && (
-         <button onClick={githubLogin} className="button centered">
-           GitHub Login
-         </button>
+
+      {!loggedIn && (
+        <button onClick={githubLogin} className="button centered">
+          GitHub Login
+        </button>
       )}
 
       {loggedIn && (
-        <form onSubmit={handleSubmit} className="upload-form">
-          {/* user info + branch select + messages */}
+        <>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
+            className="name-input centered"
+          />
+          <BranchSelect
+            selectedBranch={branch}
+            setSelectedBranch={setBranch}
+            setMessage={setMessage}
+          />
           {message && <p className="status-message centered">{message}</p>}
 
-          <ScalarFields
-            fields={scalarFields}
-            data={data}
-            onChange={handleChange}
-          />
+          <form onSubmit={handleSubmit} className="upload-form">
+            <ScalarFields
+              fields={scalarFields}
+              data={data}
+              onChange={handleChange}
+            />
 
-          <CompositionEditor
-            options={compositionList}
-            composition={data.COMPOSITION}
-            setComposition={recipe =>
-              setData(draft => {
-                recipe(draft.COMPOSITION);
-              })
-            }
-          />
-          <button type="submit" className="button centered">
-            Submit
-          </button>
+            <CompositionEditor
+              options={compositionList}
+              composition={data.COMPOSITION}
+              setComposition={recipe =>
+                setData(draft => {
+                  recipe(draft.COMPOSITION);
+                })
+              }
+            />
 
-          {pullRequestUrl && (
-            <p className="centered">
-              <a
-                href={pullRequestUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >  View Pull Request
-              </a>
-            </p>
-          )}
-        </form>
+            <button type="submit" className="button centered">
+              Submit
+            </button>
+
+            {pullRequestUrl && (
+              <p className="centered">
+                <a
+                  href={pullRequestUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Pull Request
+                </a>
+              </p>
+            )}
+          </form>
+        </>
       )}
     </div>
 
-     <div className="Right">
-        {/* Show logout button when logged in */}
-        {loggedIn && (
-          <button onClick={handleLogout} className="button centered">
-            Logout
-          </button>
-        )}
-      </div>
+    <div className="Right">
+      {loggedIn && (
+        <button onClick={handleLogout} className="button centered">
+          Logout
+        </button>
+      )}
+      <Description />
     </div>
-  );
+  </div>
+);
+
 }
