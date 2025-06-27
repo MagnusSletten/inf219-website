@@ -162,6 +162,9 @@ const handleSubmit = async e => {
     });
     console.log('Upload succeeded:', resp.data);
     setMessage('Upload succeeded!');
+    if (resp.data.pullUrl) {
+     setPullRequestUrl(resp.data.pullUrl);
+    }
   } catch (err) {
     if (err.response) {
       console.error('Server responded with:', err.response.status, err.response.data);
@@ -236,7 +239,6 @@ return (
             <button type="submit" className="button centered">
               Submit
             </button>
-
             {pullRequestUrl && (
               <p className="centered">
                 <a
