@@ -178,6 +178,7 @@ return (
     <div className="Left">
       {loggedIn && localStorage.adminStatus && (
         <div className="Admin-panel">
+          <h3> Administration panel </h3>
           <div className="refresh-panel">
             <button onClick={updateComposition} className="button centered">
               Update lipid list
