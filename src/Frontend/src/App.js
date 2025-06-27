@@ -176,22 +176,28 @@ const handleSubmit = async e => {
 return (
   <div className="Container">
     <div className="Left">
-      <div className="Admin-panel">
         {loggedIn && localStorage.adminStatus && (
-          <div className="refresh-panel">
-            <button onClick={updateComposition} className="button centered">
-              Update lipid list
-            </button>
-            {refreshMessage && <p className="centered">{refreshMessage}</p>}
-          </div>
+          <div className="Admin-panel">
+              <div className="refresh-panel">
+                <button onClick={updateComposition} className="button centered">
+                  Update lipid list
+                </button>
+                {refreshMessage && <p className="centered">{refreshMessage}</p>}
+              </div>
+           </div>
         )}
-      </div>
+     
     </div>
 
     <div className="App">
       <header className="App-header">
         <h1>Welcome to NMRLipids Upload Portal</h1>
       </header>
+       { !loggedIn && (
+         <button onClick={githubLogin} className="button centered">
+           GitHub Login
+         </button>
+      )}
 
       {loggedIn && (
         <form onSubmit={handleSubmit} className="upload-form">
@@ -230,17 +236,14 @@ return (
       )}
     </div>
 
-    <div className="Right">
-       {!loggedIn ? (
-        <button onClick={githubLogin} className="button centered">
-          GitHub Login
-        </button>
-      ) : (
-        <button onClick={handleLogout} className="button centered">
-          Logout
-        </button>
-      )}
+     <div className="Right">
+        {/* Show logout button when logged in */}
+        {loggedIn && (
+          <button onClick={handleLogout} className="button centered">
+            Logout
+          </button>
+        )}
+      </div>
     </div>
-  </div>
-);
-} 
+  );
+}
