@@ -129,8 +129,6 @@ html, body {
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.3s ease;
-  height: 40px; /* Fixed height for equal height buttons */
-  line-height: 20px; /* Adjust line height for vertical alignment */
 }
 .logoutSection{
   align-self: center;
