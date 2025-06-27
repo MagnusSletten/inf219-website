@@ -21,7 +21,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [adminStatus, setAdminStatus] = useState(
   localStorage.getItem('adminStatus') === 'true'
 );
@@ -89,7 +89,7 @@ const [data, setData] = useImmer({
 // 1) change any scalar
 const handleChange = e => {
   const { name, value } = e.target;
-  setData(draft => { draft[name] = value });
+  setData(draft => { draft[name] = value.trimEnd() });
 };
 
 

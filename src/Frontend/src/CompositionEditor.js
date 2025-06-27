@@ -36,8 +36,10 @@ export default function CompositionEditor({ composition, setComposition, options
             placeholder="Mapping"
             value={info.MAPPING || ''}
             onChange={e =>
-              setComposition(draft => { draft[lipidId].MAPPING = e.target.value; })
-            }
+            setComposition(draft => {
+              draft[lipidId].MAPPING = e.target.value.trimEnd();
+            })
+          }
           />
 
           <button type="button" onClick={() =>
