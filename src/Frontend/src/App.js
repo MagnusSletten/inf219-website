@@ -190,19 +190,8 @@ return (
 
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <h1>Welcome to NMRLipids Upload Portal</h1>
       </header>
-
-      {!loggedIn ? (
-        <button onClick={githubLogin} className="button centered">
-          GitHub Login
-        </button>
-      ) : (
-        <button onClick={handleLogout} className="button centered">
-          Logout
-        </button>
-      )}
 
       {loggedIn && (
         <form onSubmit={handleSubmit} className="upload-form">
@@ -242,7 +231,15 @@ return (
     </div>
 
     <div className="Right">
-      <Description />
+       {!loggedIn ? (
+        <button onClick={githubLogin} className="button centered">
+          GitHub Login
+        </button>
+      ) : (
+        <button onClick={handleLogout} className="button centered">
+          Logout
+        </button>
+      )}
     </div>
   </div>
 );
