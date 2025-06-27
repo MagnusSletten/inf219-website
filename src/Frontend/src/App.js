@@ -21,7 +21,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [adminStatus, setAdminStatus] = useState(
   localStorage.getItem('adminStatus') === 'true'
 );
@@ -267,19 +267,31 @@ return (
               )}
             </div>
           </form>
+                {/* Simple text link to docs */}
+         <p className="docs-link">
+          View full documentation on{' '}
+          <a
+            href="https://nmrlipids.github.io/READMEcontent.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub Pages
+          </a>.
+        </p>
         </>
       )}
     </div>
 
-    <div className="Right">
-      {loggedIn && (
-        <button onClick={handleLogout} className="button secondary
-">
-          Logout
-        </button>
-      )}
-      <Description />
-    </div>
-  </div>
+<div className="Right">
+  {loggedIn && (
+    <button onClick={handleLogout} className="button secondary">
+      Logout
+    </button>
+  )}
+  <Description />
+
+  
+</div>
+</div>
 );
 }

@@ -11,7 +11,7 @@ html, body {
 /* Grid container */
 .Container {
   display: grid;
-  grid-template-columns: 10% auto 10%;
+  grid-template-columns: 15% auto 15%;
   height: 100vh;
   overflow-y: auto;
 }
@@ -152,3 +152,8 @@ html, body {
 
 }
 
+.docs-link {
+  font-size: 1.25rem;       /* bump up the text size */
+  line-height: 1.5;         /* improve readability */
+  margin-top: 1.5rem;       /* space above */
+}
