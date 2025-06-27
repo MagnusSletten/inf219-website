@@ -202,6 +202,7 @@ return (
       {loggedIn && (
         <form onSubmit={handleSubmit} className="upload-form">
           {/* user info + branch select + messages */}
+          {message && <p className="status-message centered">{message}</p>}
 
           <ScalarFields
             fields={scalarFields}
