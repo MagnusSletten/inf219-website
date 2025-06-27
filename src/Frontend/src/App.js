@@ -246,7 +246,7 @@ return (
                   href={pullRequestUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="button secondary"
+                  className="button"
                 >
                   View Pull Request
                 </a>
@@ -259,7 +259,8 @@ return (
 
     <div className="Right">
       {loggedIn && (
-        <button onClick={handleLogout} className="button secondary">
+        <button onClick={handleLogout} className="button secondary
+">
           Logout
         </button>
       )}
