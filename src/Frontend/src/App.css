@@ -145,3 +145,10 @@ html, body {
   font-size: 1.1rem;
   color: #0d47a1;      /* match your accent blue */
 }
+.submit-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* or center, if you prefer */
+  gap: 1rem;                  /* space between button and link */
+  margin-top: 1rem;           /* if you want some breathing room above */
+}

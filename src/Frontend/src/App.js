@@ -236,20 +236,22 @@ return (
               }
             />
 
-            <button type="submit" className="button centered">
-              Submit
-            </button>
-            {pullRequestUrl && (
-              <p className="centered">
+            <div className="submit-row">
+              <button type="submit" className="button">
+                Submit
+              </button>
+
+              {pullRequestUrl && (
                 <a
                   href={pullRequestUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="button secondary"
                 >
                   View Pull Request
                 </a>
-              </p>
-            )}
+              )}
+            </div>
           </form>
         </>
       )}
@@ -257,11 +259,12 @@ return (
 
     <div className="Right">
       {loggedIn && (
-        <button onClick={handleLogout} className="button secondary">Logout</button>
+        <button onClick={handleLogout} className="button secondary">
+          Logout
+        </button>
       )}
       <Description />
     </div>
   </div>
 );
-
 }
