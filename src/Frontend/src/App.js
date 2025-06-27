@@ -197,10 +197,24 @@ return (
         <h1>Welcome to the NMRLipids Upload Portal</h1>
       </header>
 
-      {!loggedIn && (
-        <button onClick={githubLogin} className="button centered">
-          GitHub Login
-        </button>
+          {!loggedIn && (
+            
+       <> 
+        <button
+            onClick={githubLogin}
+            className="button centered"
+          >
+            GitHub Login
+          </button>
+
+         <h3>Information</h3>
+         <div className="info-block">
+         <p>Please log in with GitHub to upload data.</p>
+         <p>GitHub login is currently used as a way to authenticate users and reduce spam.</p>
+         <p>The login process authorizes the app to access your public information, specifically your username. Nothing else.</p>
+        </div>
+         
+        </>
       )}
 
       {loggedIn && (
@@ -217,7 +231,7 @@ return (
             setSelectedBranch={setBranch}
             setMessage={setMessage}
           />
-          {message && <p className="status-message-centered">{message}</p>}
+          {message && <p className="status-message-centered">Status: {message}</p>}
 
           <form onSubmit={handleSubmit} className="upload-form">
             <ScalarFields

@@ -3,17 +3,26 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color:  transparent;  
-  color: #2581e9;              
+  background-color: #6EB7F1;     /* richer sky blue */
+  color: #000;                   
   font-family: "Segoe UI", Roboto, sans-serif;
 }
 
 /* Grid container */
 .Container {
   display: grid;
-  grid-template-columns: 15% auto 15%;
+  grid-template-columns: 10% auto 10%;
   height: 100vh;
   overflow-y: auto;
+}
+
+/* Shared panel styling */
+.Left,
+.Right,
+.App {
+  background-color: #e0f2ff;     /* stronger pale azure */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border-radius: 8px;            
 }
 
 /* Left panel */
@@ -22,34 +31,25 @@ html, body {
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  border-right: 1px solid #cfd8e3; /* slightly deeper border */
+  border-right: 1px solid #b0c4de; /* slightly darker border */
 }
 
 /* Center panel */
 .App {
   display: flex;
   flex-direction: column;
-  background-color: #94a0b3;
   align-items: center;
   padding: 2rem;
   overflow-y: auto;
 }
 
-.App > button {
-  align-self: center;
-}
-
-.Left,
-.Right {
-  background-color: rgba(192, 201, 198, 0.836);
-}
 /* Right panel */
 .Right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   padding: 1rem;
-  border-left: 1px solid #cfd8e3;
+  border-left: 1px solid #b0c4de;
 }
 
 /* Header */
@@ -60,19 +60,18 @@ html, body {
 .App-header h1 {
   margin: 0;
   font-size: 1.75rem;
-  color: #0d47a1;      /* richer navy-blue */
+  color: #0b3d91;      /* deeper navy-blue */
 }
 
-/* Inputs */
+/* Form inputs */
 .name-input,
-.branch-select,
 .field input,
 .scalar-fields select {
   width: 100%;
   max-width: 320px;
   padding: 8px 12px;
   margin-bottom: 12px;
-  border: 1px solid #b0bec5;     /* more vibrant border */
+  border: 1px solid #90a4ae;     /* a bit darker */
   border-radius: 4px;
   font-size: 1rem;
 }
@@ -81,11 +80,11 @@ html, body {
 .upload-form {
   width: 100%;
   max-width: 600px;
-  background: #ffffff98;
+  background: #ffffffdd;
   padding: 1.5rem;
-  border: 1px solid #cfd8e3;
+  border: 1px solid #b0c4de;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
 }
 
 /* Grid for scalar fields */
@@ -93,40 +92,42 @@ html, body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  font-size: 20px;
 }
 
+/* Primary button */
 .button {
-  /* keep your vibrant blue */
-  background-color: #1565c0;
+  background-color: #0d47a1;     /* stronger blue */
   border: none;
   color: #fff;
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);        /* subtle depth */
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .button:hover {
-  background-color: #1976d2;                     /* slightly lighter on hover */
-  transform: translateY(-1px);                   /* micro-lift */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 
+/* Secondary (ghost) button */
 .button.secondary {
-  background: transparent;                       /* ghost style */
-  border: 1px solid #1565c0;                     /* outline only */
-  color: #1565c0;
-  box-shadow: none;
+  background: transparent;
+  border: 1px solid #0d47a1;
+  color: #0d47a1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.20);
 }
-
 .button.secondary:hover {
-  background: rgba(21, 101, 192, 0.1);           /* slight tint on hover */
+  background: rgba(13, 71, 161, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
-/* Status messages */
-.status-message-centered {
-  font-size: 1rem;
-  color: #ff8f00; /* rich amber for standout messages */
+.status-message-centered,
+.dropdown-label {
+  font-size: 25px;
+  color: #000;
   margin-bottom: 1rem;
 }
 
@@ -135,20 +136,19 @@ html, body {
   width: 100%;
   max-width: 280px;
   padding: 1rem;
-  border: 1px solid #cfd8e3;
+  border: 1px solid #b0c4de;
   border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   margin-bottom: 1rem;
 }
 .Admin-panel h3 {
   margin: 0 0 0.75rem;
   font-size: 1.1rem;
-  color: #0d47a1;      /* match your accent blue */
+  color: #0b3d91;
 }
-.submit-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* or center, if you prefer */
-  gap: 1rem;                  /* space between button and link */
-  margin-top: 1rem;           /* if you want some breathing room above */
+
+.branch-select{
+  font-size: 17px;
+
 }
+
