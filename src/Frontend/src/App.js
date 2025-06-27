@@ -177,7 +177,7 @@ return (
   <div className="Container">
     <div className="Left">
       <div className="Admin-panel">
-        {loggedIn && adminStatus && (
+        {loggedIn && localStorage.adminStatus && (
           <div className="refresh-panel">
             <button onClick={updateComposition} className="button centered">
               Update lipid list
