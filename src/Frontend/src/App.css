@@ -15,6 +15,7 @@ html, body {
 .Right {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   
 }
 
@@ -26,7 +27,10 @@ html, body {
   padding: 1rem;              /* optional spacing */
   /* width stays at 15% per your grid */
 }
+.status-message-centered{
+  font-size: 25px;
 
+}
 .refresh-button {
   width: auto;                /* shrink to fit its text */
   margin: 0;                  /* remove extra margins */

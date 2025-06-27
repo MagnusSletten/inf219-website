@@ -213,7 +213,7 @@ return (
             setSelectedBranch={setBranch}
             setMessage={setMessage}
           />
-          {message && <p className="status-message centered">{message}</p>}
+          {message && <p className="status-message-centered">{message}</p>}
 
           <form onSubmit={handleSubmit} className="upload-form">
             <ScalarFields
@@ -254,9 +254,7 @@ return (
 
     <div className="Right">
       {loggedIn && (
-        <button onClick={handleLogout} className="button centered">
-          Logout
-        </button>
+        <button onClick={handleLogout} className="button">Logout</button>
       )}
       <Description />
     </div>
