@@ -21,7 +21,7 @@ export default function App() {
   const IP = '/app/';
 
   /* Auth & User */
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [adminStatus, setAdminStatus] = useState(
   localStorage.getItem('adminStatus') === 'true'
 );
@@ -191,7 +191,7 @@ return (
 
     <div className="App">
       <header className="App-header">
-        <h1>Welcome to NMRLipids Upload Portal</h1>
+        <h1>Welcome to the NMRLipids Upload Portal</h1>
       </header>
 
       {!loggedIn && (
