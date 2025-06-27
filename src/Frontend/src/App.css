@@ -1,194 +1,133 @@
+/* Reset & base */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Ensures full coverage */
-  background-color: lightblue;
+  height: 100%;
+  background-color:  transparent;  
+  color: #2581e9;              
+  font-family: "Segoe UI", Roboto, sans-serif;
 }
 
+/* Grid container */
 .Container {
   display: grid;
-  width: 100%;
-  grid-template-columns: 15% 65% 15%;
-  justify-content: center; 
-  
+  grid-template-columns: 15% auto 15%;
+  height: 100vh;
+  overflow-y: auto;
 }
+
+/* Left panel */
+.Left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-right: 1px solid #cfd8e3; /* slightly deeper border */
+}
+
+/* Center panel */
+.App {
+  display: flex;
+  flex-direction: column;
+  background-color: #94a0b3;
+  align-items: center;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.App > button {
+  align-self: center;
+}
+
+.Left,
+.Right {
+  background-color: rgba(192, 201, 198, 0.836);
+}
+/* Right panel */
 .Right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  
+  padding: 1rem;
+  border-left: 1px solid #cfd8e3;
 }
 
-.Left {
-  display: flex;
-  flex-direction: column;     /* stack vertically if you add more later */
-  align-items: center;        /* center horizontally */
-  justify-content: flex-start;/* push to top */
-  padding: 1rem;              /* optional spacing */
-  /* width stays at 15% per your grid */
+/* Header */
+.App-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
-.status-message-centered{
-  font-size: 25px;
+.App-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #0d47a1;      /* richer navy-blue */
+}
 
-}
-.refresh-button {
-  width: auto;                /* shrink to fit its text */
-  margin: 0;                  /* remove extra margins */
-}
-.App {
-  display: flex;
-  flex-direction: column;
+/* Inputs */
+.name-input,
+.branch-select,
+.field input,
+.scalar-fields select {
   width: 100%;
-  justify-content: center; 
-  align-items: center;
-  margin: 0 auto;
-  
+  max-width: 320px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #b0bec5;     /* more vibrant border */
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
-.description-content {
-  max-width: 300px;
-  text-align: left;
+/* Upload form */
+.upload-form {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff98;
+  padding: 1.5rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.App-logo {
-  height: auto;
-  max-height: 150px;
-  width: auto;
-  max-width: 100%;
+/* Grid for scalar fields */
+.scalar-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Buttons */
+.button {
+  background-color: #0d47a1; /* vibrant navy-blue */
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.button:hover {
+  background-color: #1565c0; /* lighter, vibrant blue on hover */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Status messages */
+.status-message-centered {
+  font-size: 1rem;
+  color: #ff8f00; /* rich amber for standout messages */
   margin-bottom: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: calc(12px + 1.5vmin);
-  color: white;
-  text-align:center;
-  margin-bottom: 20px
-}
-
-.App-link {
-  color: #61dafb;
-}
-.dropdown-label {
-  font-size: 20px;
-  color: #ffffff;
-  margin-bottom: 5px;
-}
-
-
-.name-input {
-  width: 100%;              
-  padding: 10px;            
-  margin-top: 10px;
-  margin-bottom: 16px;         
-  border: 1px solid #ccc;  
-  border-radius: 4px;       
-  font-size: 16px;          
-  outline: none;
-  max-width: 300px;              
-  transition: border-color 0.3s ease; 
-}
-
-
-.branch-select {
-  margin-bottom: 16px;
-  padding: 4px; 
-  font-size: 16px; 
-}
-
-.upload-message, .logInMessage {
-  font-size: 20px;
-  color: #ffffff;
-  margin-bottom: 5px;
-  text-align: center;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Modern button styles */
-.button {
-  background-color: #007bff; /* Primary color */
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-.logoutSection{
-  align-self: center;
-}
-
-.button:hover {
-  background-color: #0056b3; 
-}
-
-.button:active {
-  background-color: #004494; }
-
-.button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Focus ring */
-}
-
-/* Hide the default file input */
-.file-input {
-  display: none;
-}
-
-/* Ensure vertical layout for form elements */
-.upload-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: calc(10px + 2vmin);
-  border: 2px solid darkblue;       /* border width, style, color */
-  border-radius: 4px;           /* slightly rounded corners */
-  padding: 16px;                /* inner spacing */
-}
-
-
-/* upload-form stays as it is */
-.scalar-fields {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);   /* two equal columns  */
-  gap: 75px;   
-  column-rule: 1px solid #ddd;                           /* space between cells */
-}
-
-
-/* each scalar “field” sits in a grid cell */
-.field {
-  display: flex;
-  flex-direction: column;
-}
+/* Admin panel */
 .Admin-panel {
-  border: 2px solid darkblue;      
-  border-radius: 4px;
-  padding: 5px;
-
-
+  width: 100%;
+  max-width: 280px;
+  background: #ffffff;
+  padding: 1rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  margin-bottom: 1rem;
 }
-
-.field label   { margin-bottom: 4px; }
-.field input   { width: 100%; }  
