@@ -145,8 +145,8 @@ def upload_file():
 
     url = utils.create_pull_request_to_target(
         head_ref=commit_branch,
-        title= f"Automated addition of data from {user_name}",
-        body=f"Processing of data will happen after pull request is made")
+        title= f"Simulation files from {user_name}",
+        body=f"Processing of simulation data will happen after approval")
 
     return jsonify(message="Uploaded!", pullUrl=url), 200
  
