@@ -83,6 +83,7 @@ const [data, setData] = useImmer({
   CPT: null,
   LOG: null,
   TOP: null,
+  GRO: null,
   EDR: null,
   COMPOSITION: {}
 });
