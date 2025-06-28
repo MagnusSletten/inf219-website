@@ -157,3 +157,8 @@ html, body {
   line-height: 1.5;         /* improve readability */
   margin-top: 1.5rem;       /* space above */
 }
+.submit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
