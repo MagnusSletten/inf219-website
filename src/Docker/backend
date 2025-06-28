@@ -17,7 +17,7 @@ ENV FLASK_APP=server.py \
 RUN apt-get update \
  && apt-get install -y --no-install-recommends git \
  && rm -rf /var/lib/apt/lists/* \
- && pip install --no-cache-dir Flask Flask-Cors PyYAML requests pyjwt PyGithub
+ && pip install --no-cache-dir Flask Flask-Cors PyYAML requests pyjwt PyGithub gunicorn
 
 # Create and switch to a non-root user
 RUN useradd -m -s /bin/bash runner

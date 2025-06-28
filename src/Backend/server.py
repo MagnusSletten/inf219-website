@@ -160,5 +160,6 @@ if __name__ == '__main__':
     # point at the real static folder
     static_dir = os.path.join(os.path.dirname(__file__), 'static')
     refresh_composition_file(static_dir)
-    app.run(host="0.0.0.0", port=5001, debug=False)
+    app.run()
+
 
