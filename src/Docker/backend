@@ -26,20 +26,15 @@ USER runner
 # Set a single working dir under /app for all repos
 WORKDIR /app
 
-# Clone Databank (with submodules) and install it
 RUN git clone \
-      --branch ${DATABANK_BRANCH} \
+      --branch "${DATABANK_BRANCH}" \
       --recurse-submodules \
-      ${DATABANK_URL} Databank \
- && pip install --break-system-packages -e Databank
-
-# Clone the website repo
-RUN git clone \
-      --branch ${WEBSITE_BRANCH} \
-      ${WEBSITE_URL} inf219-website
-
-# Ensure the runner user owns everything under /app
-RUN chown -R runner:runner /app
+      "${DATABANK_URL}" Databank \
+ && pip install --break-system-packages -e Databank \
+ && git clone \
+      --branch "${WEBSITE_BRANCH}" \
+      "${WEBSITE_URL}" inf219-website \
+ && chown -R runner:runner /app
 
 # Expose Flask port and launch from the website directory
 WORKDIR /app/inf219-website
