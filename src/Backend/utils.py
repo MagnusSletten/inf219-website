@@ -73,9 +73,9 @@ def update_databank():
     if not path:
         print("Error: DATABANK_PATH environment variable not set", file=sys.stderr)
         sys.exit(1)
-        
+
     run_command(
-        "git pull",
+        "git pull --recurse-submodules",
         error_message="Failed to pull updates for Databank",
         working_dir=path
     )
