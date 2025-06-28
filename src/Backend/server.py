@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import utils
-from utils import get_composition_names,refresh_composition_file,user_has_push_access
+from utils import get_composition_names,refresh_composition_file,user_has_push_access, update_databank
 import json
 import requests 
 import jwt
@@ -76,6 +76,7 @@ def verifyCode():
 
 @app.route('/app/refresh-composition', methods=['POST'])
 def updateCompositionList():
+    update_databank()
     auth = request.headers.get('Authorization','')
     if not auth.startswith('Bearer '):
         return jsonify(error="Missing token"), 401

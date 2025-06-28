@@ -1,55 +1,47 @@
-# Use the official Python base image
-FROM python:latest
+# Use a slim Python base for smaller image size
+FROM python:3.11-slim
 
-# Argument for repository URL
-ARG REPO_URL="https://github.com/MagnusSletten/BilayerData"
-ARG Databank_URL="https://github.com/MagnusSletten/Databank"
-ARG Databank_branch="main"
-ARG START_BRANCH_NAME="main"
-ARG website_branch="main"
+# Build args for your Databank and website repos & branches
+ARG DATABANK_URL="https://github.com/MagnusSletten/Databank"
+ARG DATABANK_BRANCH="main"
+ARG WEBSITE_URL="https://github.com/MagnusSletten/inf219-website"
+ARG WEBSITE_BRANCH="main"
 
-# Set environment variables for Flask
-ENV FLASK_APP=server.py
-ENV FLASK_ENV=production
+# Flask and Databank path environment variables
+ENV FLASK_APP=server.py \
+    FLASK_ENV=production \
+    WEBSITE_URL=${WEBSITE_URL} \
+    DATABANK_PATH=/app/Databank
 
-# Create non-root user
+# Install git & Python deps in one layer
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/* \
+ && pip install --no-cache-dir Flask Flask-Cors PyYAML requests pyjwt PyGithub
+
+# Create and switch to a non-root user
 RUN useradd -m -s /bin/bash runner
-
-# Install git and required tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    curl \
-    gnupg && \
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list && \
-    apt-get update && \
-    apt-get install -y gh && \
-    rm -rf /var/lib/apt/lists/*
-# Install required Python packages
-
-RUN pip install Flask Flask-Cors PyYAML requests pyjwt PyGithub
-
-# Switch to the non-root user
 USER runner
 
-# Set up the working directory for the website and clone
-WORKDIR /app/inf219-website
-RUN git clone --branch $website_branch https://github.com/MagnusSletten/inf219-website.git . \
- && chown -R runner:runner /app
+# Set a single working dir under /app for all repos
+WORKDIR /app
 
-# Clone the databank repo
-WORKDIR /Databank
-
+# Clone Databank (with submodules) and install it
 RUN git clone \
-      --branch ${Databank_branch} \
+      --branch ${DATABANK_BRANCH} \
       --recurse-submodules \
-      ${Databank_URL} . \
-    && pip install --break-system-packages -e .
+      ${DATABANK_URL} Databank \
+ && pip install --break-system-packages -e Databank
 
-# Expose Flask port
-EXPOSE 5001
+# Clone the website repo
+RUN git clone \
+      --branch ${WEBSITE_BRANCH} \
+      ${WEBSITE_URL} inf219-website
 
-# Set working directory back to site and launch app
+# Ensure the runner user owns everything under /app
+RUN chown -R runner:runner /app
+
+# Expose Flask port and launch from the website directory
 WORKDIR /app/inf219-website
+EXPOSE 5001
 CMD ["python3", "Backend/src/server.py"]
-

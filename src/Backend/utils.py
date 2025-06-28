@@ -64,7 +64,21 @@ def git_pull():
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while updating Git: {e}")
 
-
+def update_databank():
+    """
+    Pulls the latest changes in the Databank repo,
+    based on the DATABANK_PATH environment variable.
+    """
+    path = os.getenv("DATABANK_PATH")
+    if not path:
+        print("Error: DATABANK_PATH environment variable not set", file=sys.stderr)
+        sys.exit(1)
+        
+    run_command(
+        "git pull",
+        error_message="Failed to pull updates for Databank",
+        working_dir=path
+    )
 
 def branch_out(base_branch: str) -> str:
     ts         = time.strftime("%Y%m%d%H%M%S", time.gmtime())
