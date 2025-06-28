@@ -11,7 +11,7 @@ import ScalarFields    from './ScalarFields';
 // Scalar fields
 const scalarFields = [
   'DOI','SOFTWARE','TRJ','TPR','PREEQTIME','TIMELEFTOUT','DIR_WRK',
-  'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','AUTHORS_CONTACT',
+  'UNITEDATOM_DICT','TYPEOFSYSTEM','SYSTEM','PUBLICATION','TEMPERATURE','AUTHORS_CONTACT',
   'BATCHID','SOFTWARE_VERSION','FF','FF_SOURCE','FF_DATE','CPT','LOG','TOP','GRO','EDR',
 ];
 
@@ -71,6 +71,7 @@ const [data, setData] = useImmer({
   DIR_WRK: null,
   UNITEDATOM_DICT: null,
   TYPEOFSYSTEM: null,
+  TEMPERATURE: null,
   SYSTEM: null,
   PUBLICATION: null,
   AUTHORS_CONTACT: null,
